@@ -1,0 +1,49 @@
+```
+Exercise the WinMcpShim MCP server by running through every tool it exposes. Work entirely inside a temporary sandbox so nothing existing is touched.
+
+Procedure:
+
+1. Call `roots` to discover the allowed root directories. Pick the first writable root and create a sandbox directory inside it called `winmcpshim_smoketest_<timestamp>`. Use `mkdir` (with parents).
+
+2. Inside the sandbox, exercise the tools in this order. After each call, print one line: tool name, arguments (abbreviated), and a pass/fail verdict based on the result. Do not stop on failure — record it and continue.
+
+   File creation and reading
+   - `write` three text files:
+       a.txt  — 20 lines, each line "alpha line N" with N = 1..20
+       b.txt  — 20 lines, each line "beta line N" with the word "needle" on lines 5 and 13
+       c.txt  — a copy of b.txt with line 13 changed to "beta line 13 modified"
+   - `read` a.txt and confirm the full content round-trips.
+   - `cat` a.txt and b.txt together; confirm length = sum of parts.
+   - `head` a.txt with N=3; confirm 3 lines.
+   - `tail` a.txt with N=3; confirm last 3 lines.
+   - `wc` a.txt; confirm line count = 20.
+   - `info` a.txt; confirm it reports a regular file with non-zero size.
+
+   Search and compare
+   - `grep` for the regex `needle` across the sandbox; confirm exactly 2 matches in b.txt.
+   - `search` for the glob `*.txt` recursively from the sandbox; confirm 3 hits.
+   - `diff` b.txt vs c.txt; confirm exactly one differing line is reported.
+
+   Editing
+   - `edit` a.txt: replace the unique string "alpha line 10" with "alpha line 10 EDITED". Re-`read` and confirm.
+
+   Directory operations
+   - `mkdir` a subdirectory `sub/` inside the sandbox.
+   - `copy` a.txt to `sub/a_copy.txt`.
+   - `move` `sub/a_copy.txt` to `sub/a_moved.txt`.
+   - `list` the sandbox; confirm a.txt, b.txt, c.txt, sub/ are present.
+   - `tree` the sandbox with depth 2; confirm sub/a_moved.txt appears.
+
+   Command execution
+   - `run` a harmless command appropriate to the platform: `cmd /c echo winmcpshim_run_ok` on Windows, or `echo winmcpshim_run_ok` otherwise. Confirm the output contains the marker string.
+
+   Cleanup
+   - `delete` each file in the sandbox, then the empty subdirectory, then the sandbox itself. Confirm `list` on the parent no longer shows the sandbox.
+
+3. After the run, print a summary table: tool, status (pass/fail), and a short note for any failures. Do not summarise narratively beyond that table.
+
+Constraints:
+- Use only WinMcpShim tools — no other filesystem tools, no Python, no shell helpers outside `run`.
+- All paths must be inside the sandbox except the initial `roots` call.
+- If `roots` returns no writable location, stop and report that.
+```
