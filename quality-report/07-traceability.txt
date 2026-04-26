@@ -1,0 +1,360 @@
+﻿SPEC-TO-TEST TRACEABILITY AUDIT
+================================
+
+SPEC SECTIONS:
+### 4.1 Request ID Preservation
+### 4.2 Tool Annotations
+### 4.3 Protocol Version
+### 5.1 Tool List
+### 5.2 read
+### 5.3 write
+### 5.4 edit
+### 5.5 copy
+### 5.6 move
+### 5.7 delete
+### 5.8 list
+### 5.9 search
+### 5.10 info
+### 5.11 run
+### 5.12 cat
+### 5.13 mkdir
+### 5.14 head
+### 5.15 tail
+### 5.16 diff
+### 5.17 wc
+### 5.18 tree
+### 5.19 roots
+### 5.20 grep (built-in fallback)
+### 6.1 Config-Driven Tool Declaration
+### 6.2 Execution Model
+### 6.3 Inactivity Timeout
+### 6.4 Exit Code Handling
+### 6.5 Output Size Limit
+### 6.6 Timeout Parameter Injection
+### 8.1 Path Confinement
+### 8.2 No Shell Execution
+### 8.3 No Recursive Delete
+### 8.4 No Binary File Operations
+### 9.1 General Principles
+### 9.2 File Locking
+### 9.3 Atomic Writes
+### 9.4 Long Paths
+### 9.5 Concurrent Pipe Draining
+### 9.6 Child Stdin Handling
+### 9.7 Concurrent Requests
+### 9.8 Child Process Lifecycle
+### 9.9 Runaway Child Processes
+### 9.10 Windows-Specific Process Considerations
+### 9.11 Panic Recovery
+### 9.12 Shutdown Procedure
+### 9.13 Config File Errors
+### 9.14 Failure Table
+### 9.15 Critical Error Alerting
+#### 9.15.1 Classification
+#### 9.15.2 Tool response format
+#### 9.15.3 Supplementary notification
+#### 9.15.4 Implementation
+### 10.1 --verbose Flag
+### 10.2 --log Flag
+### 10.3 --scan Flag
+### 11.1 Config File
+### 11.2 Built-In Tool Descriptions
+### 11.3 Command Line
+### 11.4 Claude Desktop Configuration
+### 12.1 Prerequisites
+### 12.2 Project Structure
+### 12.3 Build Commands
+### 12.4 Dependencies
+### 14.1 Approach
+### 14.2 File Operation Tests
+### 14.3 run Tool Tests
+### 14.4 Configured Tool Tests
+### 14.5 Process Lifecycle Tests
+### 14.6 Panic Recovery Tests
+### 14.7 Shutdown Tests
+### 14.8 UTF-16 Decode Tests
+### 14.9 Built-in Grep Tests
+### 14.10 Stderr Cap Tests
+### 14.11 Confinement Error Message Tests
+
+TEST FUNCTIONS:
+shim_test.go:func TestMain(m *testing.M) {
+shim_test.go:func TestProtocol_Initialize(t *testing.T) {
+shim_test.go:func TestProtocol_ToolsList(t *testing.T) {
+shim_test.go:func TestProtocol_UnknownMethod(t *testing.T) {
+shim_test.go:func TestProtocol_UnknownTool(t *testing.T) {
+shim_test.go:func TestRead_HappyPath(t *testing.T) {
+shim_test.go:func TestRead_FileNotFound(t *testing.T) {
+shim_test.go:func TestRead_BinaryFile(t *testing.T) {
+shim_test.go:func TestRead_UTF16File(t *testing.T) {
+shim_test.go:func TestRead_TooLarge(t *testing.T) {
+shim_test.go:func TestRead_PathOutsideRoots(t *testing.T) {
+shim_test.go:func TestWrite_HappyPath(t *testing.T) {
+shim_test.go:func TestWrite_CRLFPreservation(t *testing.T) {
+shim_test.go:func TestEdit_HappyPath(t *testing.T) {
+shim_test.go:func TestEdit_NotFound(t *testing.T) {
+shim_test.go:func TestEdit_NotUnique(t *testing.T) {
+shim_test.go:func TestCopy_HappyPath(t *testing.T) {
+shim_test.go:func TestCopy_DestinationExists(t *testing.T) {
+shim_test.go:func TestMove_HappyPath(t *testing.T) {
+shim_test.go:func TestMove_DestinationExists(t *testing.T) {
+shim_test.go:func TestDelete_File(t *testing.T) {
+shim_test.go:func TestDelete_EmptyDir(t *testing.T) {
+shim_test.go:func TestDelete_NonEmptyDir(t *testing.T) {
+shim_test.go:func TestList_WithAndWithoutPattern(t *testing.T) {
+shim_test.go:func TestSearch_Recursive(t *testing.T) {
+shim_test.go:func TestSearch_MaxResults(t *testing.T) {
+shim_test.go:func TestInfo_FileAndDirectory(t *testing.T) {
+shim_test.go:func TestRun_SimpleCommand(t *testing.T) {
+shim_test.go:func TestRun_NonZeroExit(t *testing.T) {
+shim_test.go:func TestRun_InactivityTimeout(t *testing.T) {
+shim_test.go:func TestRun_TotalTimeout(t *testing.T) {
+shim_test.go:func TestRun_OutputTruncation(t *testing.T) {
+shim_test.go:func TestSecurity_JunctionEscape(t *testing.T) {
+shim_test.go:func TestRun_ConcurrentPipeDraining(t *testing.T) {
+shim_test.go:func TestRun_JobObjectGrandchildKilled(t *testing.T) {
+shim_test.go:func TestRun_WERSuppression(t *testing.T) {
+shim_test.go:func TestRun_HandleLeak(t *testing.T) {
+shim_test.go:func TestPanicRecovery(t *testing.T) {
+shim_test.go:func TestShutdown_StdinEOF(t *testing.T) {
+shim_test.go:func TestShutdown_WhileChildRunning(t *testing.T) {
+shim_test.go:func TestShutdown_BrokenStdoutPipe(t *testing.T) {
+shim_test.go:func TestErrorContinuation(t *testing.T) {
+shim_test.go:func TestRun_ChildStdinEOF(t *testing.T) {
+shim_test.go:func TestProtocol_IdTypePreservation(t *testing.T) {
+shim_test.go:func TestProtocol_NotificationNoResponse(t *testing.T) {
+shim_test.go:func TestRead_UTF8BOMSkipped(t *testing.T) {
+shim_test.go:func TestRead_OffsetLimit(t *testing.T) {
+shim_test.go:func TestWrite_AppendMode(t *testing.T) {
+shim_test.go:func TestWrite_NewFileLF(t *testing.T) {
+shim_test.go:func TestCopy_RecursiveDir(t *testing.T) {
+shim_test.go:func TestCopy_DirWithoutRecursive(t *testing.T) {
+shim_test.go:func TestDelete_NonEmptyDirSemantics(t *testing.T) {
+shim_test.go:func TestList_OutputFormat(t *testing.T) {
+shim_test.go:func TestSearch_AbsolutePaths(t *testing.T) {
+shim_test.go:func TestInfo_CreationTimeAndReadOnly(t *testing.T) {
+shim_test.go:func TestRun_ArgumentSplitting(t *testing.T) {
+shim_test.go:func TestRun_CommandConfinement(t *testing.T) {
+shim_test.go:func TestRun_TimeoutParameter(t *testing.T) {
+shim_test.go:func TestClampTimeout(t *testing.T) {
+shim_test.go:func TestConfig_ParamValidation(t *testing.T) {
+shim_test.go:func TestToolsList_TimeoutParam(t *testing.T) {
+shim_test.go:func TestRun_TimeoutStrippedFromParams(t *testing.T) {
+shim_test.go:func TestRead_FileLocked(t *testing.T) {
+shim_test.go:func TestConfig_MissingConfigStartsWithBuiltins(t *testing.T) {
+shim_test.go:func TestConfig_MalformedConfigRefusesStart(t *testing.T) {
+shim_test.go:func TestConfig_UTF16ConfigRefusesStart(t *testing.T) {
+shim_test.go:func TestConfig_MissingBuiltinDescriptionsRefusesStart(t *testing.T) {
+shim_test.go:func TestDiag_Verbose(t *testing.T) {
+shim_test.go:func TestDiag_LogFile(t *testing.T) {
+shim_test.go:func TestDiag_Scan(t *testing.T) {
+shim_test.go:func TestConfig_MaxTimeoutClamp(t *testing.T) {
+shim_test.go:func TestLongPaths(t *testing.T) {
+shim_test.go:func TestRun_SpecialCharsNoInjection(t *testing.T) {
+shim_test.go:func TestMkdir_HappyPath(t *testing.T) {
+shim_test.go:func TestMkdir_OutsideRoots(t *testing.T) {
+shim_test.go:func TestTree_HappyPath(t *testing.T) {
+shim_test.go:func TestTree_DepthLimit(t *testing.T) {
+shim_test.go:func TestTree_EmptyDir(t *testing.T) {
+shim_test.go:func TestHead_HappyPath(t *testing.T) {
+shim_test.go:func TestHead_FileNotFound(t *testing.T) {
+shim_test.go:func TestTail_HappyPath(t *testing.T) {
+shim_test.go:func TestTail_BinaryRefused(t *testing.T) {
+shim_test.go:func TestWc_HappyPath(t *testing.T) {
+shim_test.go:func TestWc_FileNotFound(t *testing.T) {
+shim_test.go:func TestDiff_DifferentFiles(t *testing.T) {
+shim_test.go:func TestDiff_IdenticalFiles(t *testing.T) {
+shim_test.go:func TestCat_MultipleFiles(t *testing.T) {
+shim_test.go:func TestCat_MissingFile(t *testing.T) {
+shim_test.go:func TestRoots_ReturnsAllowedRoots(t *testing.T) {
+shim_test.go:func TestToolsList_NewBuiltins(t *testing.T) {
+shim_test.go:func TestCat_MaxOutputExceeded(t *testing.T) {
+shim_test.go:func TestTail_LargeFile(t *testing.T) {
+shim_test.go:func TestDiff_ContextLines(t *testing.T) {
+shim_test.go:func TestTree_PatternFilter(t *testing.T) {
+shim_test.go:func TestToolsList_NoTotalTimeout(t *testing.T) {
+shim_test.go:func TestRun_TimeoutIsTextResult(t *testing.T) {
+shim_test.go:func TestConfiguredTool_GrepIntegration(t *testing.T) {
+shim_test.go:func TestCriticalError_ConfinementFormat(t *testing.T) {
+shim_test.go:func TestCriticalError_ResponseFormat(t *testing.T) {
+shim_test.go:func TestCriticalError_Notification(t *testing.T) {
+shim_test.go:func TestRun_ComboAttack(t *testing.T) {
+grep_test.go:func TestGrep_SingleFileMatch(t *testing.T) {
+grep_test.go:func TestGrep_SingleFileNoMatch(t *testing.T) {
+grep_test.go:func TestGrep_RecursiveSearch(t *testing.T) {
+grep_test.go:func TestGrep_IgnoreCase(t *testing.T) {
+grep_test.go:func TestGrep_ContextLines(t *testing.T) {
+grep_test.go:func TestGrep_MaxResults(t *testing.T) {
+grep_test.go:func TestGrep_BinaryFileSkipped(t *testing.T) {
+grep_test.go:func TestGrep_UTF16FileDecoded(t *testing.T) {
+grep_test.go:func TestGrep_CRLFStripped(t *testing.T) {
+grep_test.go:func TestGrep_PathConfinement(t *testing.T) {
+grep_test.go:func TestGrep_InvalidRegex(t *testing.T) {
+grep_test.go:func TestGrep_FallbackRegistration(t *testing.T) {
+grep_test.go:func TestGrep_ExternalPriority(t *testing.T) {
+grep_test.go:func TestGrep_LargeFile(t *testing.T) {
+grep_test.go:func TestGrep_EmptyFile(t *testing.T) {
+grep_test.go:func TestGrep_EmptyPattern(t *testing.T) {
+grep_test.go:func TestGrep_FileNotFound(t *testing.T) {
+grep_test.go:func TestGrep_DirectoryNotFound(t *testing.T) {
+grep_test.go:func TestGrep_NoMatchesAnywhere(t *testing.T) {
+grep_test.go:func TestGrep_LineNumbersFalse(t *testing.T) {
+grep_test.go:func TestGrep_RecursiveFalseOnDir(t *testing.T) {
+grep_test.go:func TestGrep_IncludeNoMatches(t *testing.T) {
+grep_test.go:func TestGrep_ContextZero(t *testing.T) {
+grep_test.go:func TestGrep_OverlappingContext(t *testing.T) {
+grep_test.go:func TestGrep_ContextSeparator(t *testing.T) {
+grep_test.go:func TestGrep_MatchAtFileStart(t *testing.T) {
+grep_test.go:func TestGrep_MatchAtFileEnd(t *testing.T) {
+grep_test.go:func TestGrep_ConsecutiveMatches(t *testing.T) {
+grep_test.go:func TestGrep_PermissionDenied(t *testing.T) {
+grep_test.go:func TestGrep_SymlinkOutsideRoots(t *testing.T) {
+grep_test.go:func TestGrep_VeryLongLine(t *testing.T) {
+grep_test.go:func TestGrep_MixedBinaryAndText(t *testing.T) {
+grep_test.go:func TestGrep_UnicodeContent(t *testing.T) {
+grep_test.go:func TestGrep_UnicodePattern(t *testing.T) {
+grep_test.go:func TestGrep_DollarAnchorCRLF(t *testing.T) {
+grep_test.go:func TestGrep_CaretAnchor(t *testing.T) {
+grep_test.go:func TestGrep_MultipleMatchesSameLine(t *testing.T) {
+run_test.go:func TestRun_StderrTruncated(t *testing.T) {
+run_test.go:func TestRun_StderrUnderLimit(t *testing.T) {
+run_test.go:func TestRun_BothTruncated(t *testing.T) {
+critical_test.go:func TestCriticalErrorText_StartsWithPrefix(t *testing.T) {
+critical_test.go:func TestCriticalErrorText_ContainsMessage(t *testing.T) {
+critical_test.go:func TestCriticalErrorText_ContainsAlertInstruction(t *testing.T) {
+critical_test.go:func TestCriticalErrorText_ContainsDoNotRetry(t *testing.T) {
+critical_test.go:func TestIsCriticalError_TrueForCritical(t *testing.T) {
+critical_test.go:func TestIsCriticalError_FalseForNormal(t *testing.T) {
+utf16_test.go:func TestDetectTextEncoding_UTF16LE(t *testing.T) {
+utf16_test.go:func TestDetectTextEncoding_UTF16BE(t *testing.T) {
+utf16_test.go:func TestDetectTextEncoding_Binary(t *testing.T) {
+utf16_test.go:func TestDetectTextEncoding_UTF8(t *testing.T) {
+utf16_test.go:func TestDecodeUTF16_LE(t *testing.T) {
+utf16_test.go:func TestDecodeUTF16_BE(t *testing.T) {
+utf16_test.go:func TestDecodeUTF16_OddBytes(t *testing.T) {
+utf16_test.go:func TestDecodeUTF16_NonUTF16Encoding(t *testing.T) {
+utf16_test.go:func TestDecodeUTF16_TooShort(t *testing.T) {
+utf16_test.go:func TestDecodeUTF16_EmptyAfterBOM(t *testing.T) {
+utf16_test.go:func TestDecodeUTF16_CRLF(t *testing.T) {
+main_test.go:func TestMain(m *testing.M) {
+main_test.go:func TestHappyPath_LF(t *testing.T) {
+main_test.go:func TestHappyPath_CRLF_LFSearch(t *testing.T) {
+main_test.go:func TestHappyPath_CRLF_CRLFSearch(t *testing.T) {
+main_test.go:func TestHappyPath_UTF8BOM(t *testing.T) {
+main_test.go:func TestHappyPath_EmptyReplacement(t *testing.T) {
+main_test.go:func TestHappyPath_ReplacementContainsSearch(t *testing.T) {
+main_test.go:func TestHappyPath_MultiLine(t *testing.T) {
+main_test.go:func TestHappyPath_Tabs(t *testing.T) {
+main_test.go:func TestHappyPath_Backslashes(t *testing.T) {
+main_test.go:func TestHappyPath_Quotes(t *testing.T) {
+main_test.go:func TestHappyPath_Unicode(t *testing.T) {
+main_test.go:func TestHappyPath_LargeFile(t *testing.T) {
+main_test.go:func TestRefusal_BinaryFile(t *testing.T) {
+main_test.go:func TestRefusal_UTF16(t *testing.T) {
+main_test.go:func TestRefusal_UTF16BE(t *testing.T) {
+main_test.go:func TestRefusal_TooLarge(t *testing.T) {
+main_test.go:func TestRefusal_NotFound(t *testing.T) {
+main_test.go:func TestRefusal_NotUnique(t *testing.T) {
+main_test.go:func TestRefusal_EmptySearch(t *testing.T) {
+main_test.go:func TestRefusal_FileNotFound(t *testing.T) {
+main_test.go:func TestRefusal_ReadOnly(t *testing.T) {
+main_test.go:func TestRefusal_InvalidJSON(t *testing.T) {
+main_test.go:func TestRefusal_MissingField(t *testing.T) {
+main_test.go:func TestRefusal_EmptyStdin(t *testing.T) {
+main_test.go:func TestRefusal_TruncatedJSON(t *testing.T) {
+main_test.go:func TestAtomicity_OriginalIntactOnNotFound(t *testing.T) {
+main_test.go:func TestAtomicity_OriginalIntactOnNotUnique(t *testing.T) {
+main_test.go:func TestRefusal_FileLocked(t *testing.T) {
+main_test.go:func TestHappyPath_NoFinalNewline(t *testing.T) {
+atomic_test.go:func TestWriteAtomic_NewFile(t *testing.T) {
+atomic_test.go:func TestWriteAtomic_Overwrite(t *testing.T) {
+atomic_test.go:func TestWriteAtomic_NoLeftoverTmp(t *testing.T) {
+atomic_test.go:func TestWriteAtomic_OriginalIntactOnFailure(t *testing.T) {
+atomic_test.go:func TestWriteAtomic_PathWithSpaces(t *testing.T) {
+atomic_test.go:func TestBackupFile_CreatesTimestampedCopy(t *testing.T) {
+atomic_test.go:func TestBackupFile_ContentMatches(t *testing.T) {
+atomic_test.go:func TestBackupFile_AppendsSuffix(t *testing.T) {
+claude_config_test.go:func TestReadClaudeConfig_ValidJSON(t *testing.T) {
+claude_config_test.go:func TestReadClaudeConfig_MalformedJSON(t *testing.T) {
+claude_config_test.go:func TestReadClaudeConfig_TrailingComma(t *testing.T) {
+claude_config_test.go:func TestReadClaudeConfig_NonExistent(t *testing.T) {
+claude_config_test.go:func TestUpdateClaudeConfig_AddsMcpServers(t *testing.T) {
+claude_config_test.go:func TestUpdateClaudeConfig_AddsEntry(t *testing.T) {
+claude_config_test.go:func TestUpdateClaudeConfig_Skipped(t *testing.T) {
+claude_config_test.go:func TestUpdateClaudeConfig_Updated(t *testing.T) {
+claude_config_test.go:func TestUpdateClaudeConfig_PreservesOtherServers(t *testing.T) {
+claude_config_test.go:func TestUpdateClaudeConfig_PreservesOtherProperties(t *testing.T) {
+claude_config_test.go:func TestUpdateClaudeConfig_PreservesNestedDepth(t *testing.T) {
+claude_config_test.go:func TestNewClaudeConfig_Structure(t *testing.T) {
+claude_config_test.go:func TestMarshalConfig_RoundTrip(t *testing.T) {
+claude_config_test.go:func TestRemoveShimEntry_PreservesOthers(t *testing.T) {
+claude_config_test.go:func TestRemoveShimEntry_RemovesEmptyMcpServers(t *testing.T) {
+claude_config_test.go:func TestRemoveShimEntry_NotPresent(t *testing.T) {
+claude_config_test.go:func TestRemoveShimEntry_NoMcpServers(t *testing.T) {
+discover_test.go:func TestCheckWindowsVersion_Win81(t *testing.T) {
+discover_test.go:func TestCheckWindowsVersion_Win10RTM(t *testing.T) {
+discover_test.go:func TestCheckWindowsVersion_Win10_22H2(t *testing.T) {
+discover_test.go:func TestCheckShimFiles_MissingShim(t *testing.T) {
+discover_test.go:func TestCheckShimFiles_MissingStrpatch(t *testing.T) {
+discover_test.go:func TestCheckShimFiles_MissingExample(t *testing.T) {
+discover_test.go:func TestCheckShimFiles_AllPresent(t *testing.T) {
+discover_test.go:func TestCheckGitTools_AllPresent(t *testing.T) {
+discover_test.go:func TestCheckGitTools_MissingGawk(t *testing.T) {
+discover_test.go:func TestCheckGitTools_EmptyUsrBin(t *testing.T) {
+discover_test.go:func TestCheckClaudeDesktop_Missing(t *testing.T) {
+discover_test.go:func TestCheckClaudeDesktop_Exists(t *testing.T) {
+discover_test.go:func TestCheckTarExe_RealSystem(t *testing.T) {
+integration_test.go:func TestFindClaudeProcesses_CaseInsensitive(t *testing.T) {
+integration_test.go:func TestIntegration_FullPipeline(t *testing.T) {
+integration_test.go:func TestIntegration_Idempotent(t *testing.T) {
+integration_test.go:func TestIntegration_RollbackRemovesToml(t *testing.T) {
+integration_test.go:func TestIntegration_RollbackRestoresConfig(t *testing.T) {
+process_test.go:func TestFindClaudeProcesses_NoPanic(t *testing.T) {
+process_test.go:func TestIsClaudeProcess_MixedCase(t *testing.T) {
+process_test.go:func TestIsClaudeProcess_LowerCase(t *testing.T) {
+process_test.go:func TestIsClaudeProcess_UpperCase(t *testing.T) {
+process_test.go:func TestIsClaudeProcess_Explorer(t *testing.T) {
+process_test.go:func TestIsClaudeProcess_Helper(t *testing.T) {
+process_test.go:func TestIsClaudeProcess_ClaudeNot(t *testing.T) {
+process_test.go:func TestIsShimProcess_LowerCase(t *testing.T) {
+process_test.go:func TestIsShimProcess_MixedCase(t *testing.T) {
+process_test.go:func TestIsShimProcess_Claude(t *testing.T) {
+process_test.go:func TestIsClaudeProcess_Conhost(t *testing.T) {
+process_test.go:func TestIsClaudeProcess_Shim(t *testing.T) {
+rollback_test.go:func TestUndoStack_ReverseOrder(t *testing.T) {
+rollback_test.go:func TestUndoStack_FailingUndoContinues(t *testing.T) {
+rollback_test.go:func TestUndoStack_ReturnsLog(t *testing.T) {
+rollback_test.go:func TestUndoStack_RemovesCreatedFile(t *testing.T) {
+rollback_test.go:func TestUndoStack_RestoresFromBackup(t *testing.T) {
+rollback_test.go:func TestUndoStack_Empty(t *testing.T) {
+toml_test.go:func TestGetTomlState_Missing(t *testing.T) {
+toml_test.go:func TestGetTomlState_Unconfigured(t *testing.T) {
+toml_test.go:func TestGetTomlState_Configured(t *testing.T) {
+toml_test.go:func TestValidateRoot_ExistingDir(t *testing.T) {
+toml_test.go:func TestValidateRoot_NonExistent(t *testing.T) {
+toml_test.go:func TestValidateRoot_File(t *testing.T) {
+toml_test.go:func TestValidateRoot_TrimsWhitespace(t *testing.T) {
+toml_test.go:func TestValidateRoot_RemovesTrailingBackslash(t *testing.T) {
+toml_test.go:func TestValidateRoot_ResolvesRelative(t *testing.T) {
+toml_test.go:func TestValidateRoots_DeduplicatesCaseInsensitive(t *testing.T) {
+toml_test.go:func TestValidateRoots_DeduplicatesTrailingBackslash(t *testing.T) {
+toml_test.go:func TestValidateRoots_ReturnsRejected(t *testing.T) {
+toml_test.go:func TestSetAllowedRoots_SingleRoot(t *testing.T) {
+toml_test.go:func TestSetAllowedRoots_MultipleRoots(t *testing.T) {
+toml_test.go:func TestSetAllowedRoots_ReplacesExisting(t *testing.T) {
+toml_test.go:func TestSetAllowedRoots_BackslashEscaping(t *testing.T) {
+toml_test.go:func TestSetAllowedRoots_PreservesOtherContent(t *testing.T) {
+toml_test.go:func TestSetGitPaths_ReplacesDefault(t *testing.T) {
+toml_test.go:func TestSetGitPaths_PathWithSpaces(t *testing.T) {
+toml_test.go:func TestSetGitPaths_NonCDrive(t *testing.T) {
+toml_test.go:func TestSetGitPaths_UpdatesScanDirs(t *testing.T) {
+toml_test.go:func TestSetGitPaths_PreservesTarPath(t *testing.T) {
+toml_test.go:func TestFormatTomlRoots_OnePath(t *testing.T) {
+toml_test.go:func TestFormatTomlRoots_ThreePaths(t *testing.T) {
+toml_test.go:func TestFormatTomlRoots_EscapesBackslashes(t *testing.T) {
+toml_test.go:func TestValidateToml_AcceptsSetAllowedRootsOutput(t *testing.T) {
+toml_test.go:func TestValidateToml_RejectsUnclosedBracket(t *testing.T) {
+toml_test.go:func TestSetGitPaths_ValidateToml_RoundTrip(t *testing.T) {
+toml_test.go:func TestFullPipeline_TomlModification(t *testing.T) {
+types_test.go:func TestCheckStatus_Values(t *testing.T) {
+types_test.go:func TestRequiredGitTools_Count(t *testing.T) {

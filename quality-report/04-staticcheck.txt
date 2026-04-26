@@ -1,0 +1,10 @@
+﻿installer\atomic.go:1:1: at least one file in a package should have a package comment (ST1000)
+installer\claude_config.go:1:1: at least one file in a package should have a package comment (ST1000)
+installer\discover.go:3:1: at least one file in a package should have a package comment (ST1000)
+installer\process.go:3:1: at least one file in a package should have a package comment (ST1000)
+installer\rollback.go:1:1: at least one file in a package should have a package comment (ST1000)
+installer\toml.go:1:1: at least one file in a package should have a package comment (ST1000)
+installer\types.go:1:1: at least one file in a package should have a package comment (ST1000)
+tools\grep_test.go:409:3: empty branch (SA9003)
+
+--- strpatch module ---

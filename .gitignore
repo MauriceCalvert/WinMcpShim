@@ -1,0 +1,32 @@
+# Executables
+*.exe
+*.exe~
+bin/
+
+# MCPB bundle build output (publish via GitHub Releases)
+dist/
+bundle/
+*.mcpb
+
+# Logs
+*.log
+
+# Test artifacts
+*.dat
+testbed/
+
+# User-specific config (template is tracked as shim.toml.example)
+shim.toml
+shim.toml.bak.*
+
+# Test scratch files
+*.jsonl
+
+# Internal session briefs (not for public repo)
+docs/SESSION*_BRIEF.md
+
+# Internal notes
+docs/upgrade.md
+
+# Personal Claude Desktop config
+claude_desktop_config.json

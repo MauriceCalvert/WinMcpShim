@@ -1,0 +1,100 @@
+{
+  "$schema": "https://raw.githubusercontent.com/modelcontextprotocol/mcpb/main/schemas/mcpb-manifest-v0.3.schema.json",
+  "manifest_version": "0.3",
+  "name": "winmcpshim",
+  "display_name": "WinMcpShim",
+  "version": "1.1.4",
+  "description": "Fast native Windows file, text, and command utilities.",
+  "long_description": "WinMcpShim is an MCP server for Windows providing a complete set of file, directory, and text utilities (cat, grep, head, tail, diff, edit, tree, etc.) plus an allowlisted shell runner. Implemented as a single statically-linked Go binary with no runtime dependencies. Benchmarks show ~7.8 times faster cold start and ~22.9 times faster single-file grep than Python/Node reference MCP servers. Developed to DO-178C avionics practices: 503 tests, 88% merged coverage, integration tests against adversarial child processes (pipe flooding, crashes, grandchild spawning), TOCTOU-hardened path confinement via GetFinalPathNameByHandle, and an explicit allowlist for the run tool.",
+  "author": {
+    "name": "Maurice Calvert",
+    "url": "https://www.calvert.ch/maurice"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MauriceCalvert/WinMcpShim"
+  },
+  "homepage": "https://github.com/MauriceCalvert/WinMcpShim",
+  "documentation": "https://github.com/MauriceCalvert/WinMcpShim#readme",
+  "support": "https://github.com/MauriceCalvert/WinMcpShim/issues",
+  "icon": "icon.png",
+  "privacy_policies": [
+    "https://github.com/MauriceCalvert/WinMcpShim/blob/main/PRIVACY.md"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "windows",
+    "filesystem",
+    "files",
+    "grep",
+    "shell",
+    "go",
+    "native"
+  ],
+  "server": {
+    "type": "binary",
+    "entry_point": "winmcpshim.exe",
+    "mcp_config": {
+      "command": "${__dirname}/winmcpshim.exe",
+      "args": [
+        "--allowed-roots", "${user_config.allowed_roots}",
+        "--allowed-commands", "${user_config.allowed_commands}",
+        "--max-timeout", "${user_config.max_timeout}"
+      ],
+      "env": {}
+    }
+  },
+  "user_config": {
+    "allowed_roots": {
+      "type": "directory",
+      "title": "Allowed root directories",
+      "description": "Directories WinMcpShim is permitted to read or write under, and from which the run tool may execute any file. All file operations outside these roots are rejected; symlink and NTFS-junction escapes are detected. ⚠ MAKE SURE NOT TO LEAVE EMPTY ENTRIES IN THIS LIST — typing a path and clicking Add adds both the path AND a blank row; remove the blank row before saving or the extension will fail to start.",
+      "multiple": true,
+      "required": true,
+      "default": ["${HOME}\\Documents"]
+    },
+    "allowed_commands": {
+      "type": "file",
+      "title": "Allowed executables for the run tool (optional)",
+      "description": "Pick each .exe the run tool is permitted to invoke. Selections are matched by absolute path at call time. Executables inside the allowed root directories are always permitted regardless of this list. ⚠ MAKE SURE NOT TO LEAVE EMPTY ENTRIES IN THIS LIST — typing and clicking Add adds both the value AND a blank row; remove the blank row before saving or the extension will fail to start.",
+      "multiple": true,
+      "required": false,
+      "default": []
+    },
+    "max_timeout": {
+      "type": "number",
+      "title": "Maximum tool-call timeout (seconds)",
+      "description": "Upper bound on per-tool-call timeouts that Claude can request (1 to 600). Affects the run tool and external tools.",
+      "required": false,
+      "default": 60,
+      "min": 1,
+      "max": 600
+    }
+  },
+  "tools": [
+    { "name": "cat",    "description": "Read one or more files in a single call." },
+    { "name": "copy",   "description": "Copy a file or directory tree." },
+    { "name": "delete", "description": "Delete a single file or empty directory." },
+    { "name": "diff",   "description": "Compare two text files and show unified diff." },
+    { "name": "edit",   "description": "Find-and-replace a unique string in a file." },
+    { "name": "grep",   "description": "Search inside file contents by regex (Go RE2)." },
+    { "name": "head",   "description": "Show the first N lines of a file." },
+    { "name": "info",   "description": "Get file or directory metadata." },
+    { "name": "list",   "description": "List one directory level with optional glob filter." },
+    { "name": "mkdir",  "description": "Create a directory and any missing parents." },
+    { "name": "move",   "description": "Move or rename a file or directory." },
+    { "name": "read",   "description": "Read a single text file with optional offset/limit." },
+    { "name": "roots",  "description": "Return the list of allowed root directories." },
+    { "name": "run",    "description": "Execute a command restricted by an allowlist or directory confinement." },
+    { "name": "search", "description": "Recursively find files by name glob." },
+    { "name": "tail",   "description": "Show the last N lines of a file." },
+    { "name": "tree",   "description": "Recursive indented directory listing." },
+    { "name": "wc",     "description": "Count lines, words, and bytes in a text file." },
+    { "name": "write",  "description": "Create or overwrite a text file atomically." }
+  ],
+  "tools_generated": true,
+  "compatibility": {
+    "claude_desktop": ">=0.10.0",
+    "platforms": ["win32"]
+  }
+}

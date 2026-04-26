@@ -1,0 +1,4 @@
+﻿No vulnerabilities found.
+
+--- strpatch module ---
+No vulnerabilities found.

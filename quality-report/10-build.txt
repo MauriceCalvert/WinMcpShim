@@ -1,0 +1,22 @@
+﻿BUILD AND CI CONSISTENCY
+========================
+
+1. go.mod Go version:
+go 1.25.0
+
+2. CI workflow Go version:
+go-version: '1.22'
+
+3. README claimed Go version:
+Requires **Go 1.22+** (tested with Go 1.26.1).
+
+============================================
+4. Build check
+============================================
+OK: shim builds cleanly
+OK: strpatch builds cleanly
+
+============================================
+5. Module tidiness
+============================================
+OK: module is tidy

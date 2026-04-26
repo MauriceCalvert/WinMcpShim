@@ -1,0 +1,67 @@
+﻿Functions with complexity > 10:
+
+35 tools unifiedDiff tools\builtin.go:483:1
+34 main execute cmd\install\main.go:226:1
+31 tools ExecuteWithTimeouts tools\run.go:99:1
+31 tools Grep tools\grep.go:16:1
+28 main handleToolsCall shim\main.go:138:1
+24 tools Read tools\builtin.go:20:1
+22 tools DispatchExternalTool tools\external.go:340:1
+19 main shimMain shim\main.go:25:1
+19 main run cmd\install\main.go:19:1
+15 tools Wc tools\builtin.go:889:1
+15 tools Head tools\builtin.go:599:1
+15 tools Cat tools\builtin.go:349:1
+15 tools readUTF16 tools\builtin.go:97:1
+15 shared LoadConfig shared\config.go:82:1
+15 main run cmd\uninstall\main.go:18:1
+14 tools Tree tools\builtin.go:835:1
+14 tools Tail tools\builtin.go:679:1
+14 main printComparison cmd\bench\main.go:456:1
+13 tools grepWithContext tools\grep.go:217:1
+13 tools Write tools\builtin.go:142:1
+13 main main testhelpers\rogue\main.go:18:1
+12 tools ExecuteExternal tools\run.go:310:1
+12 tools tailUTF16 tools\builtin.go:768:1
+12 main TestCriticalError_Notification shim\shim_test.go:2606:1
+12 main callToolCritical shim\shim_test.go:216:1
+11 tools grepFile tools\grep.go:148:1
+11 tools Diff tools\builtin.go:426:1
+11 main checkRefusals strpatch\main.go:154:1
+11 main callTool cmd\bench\main.go:317:1
+
+============================================
+TOP 20 MOST COMPLEX FUNCTIONS
+============================================
+35 tools unifiedDiff tools\builtin.go:483:1
+34 main execute cmd\install\main.go:226:1
+31 tools ExecuteWithTimeouts tools\run.go:99:1
+31 tools Grep tools\grep.go:16:1
+28 main handleToolsCall shim\main.go:138:1
+24 tools Read tools\builtin.go:20:1
+22 tools DispatchExternalTool tools\external.go:340:1
+19 main shimMain shim\main.go:25:1
+19 main run cmd\install\main.go:19:1
+15 tools Wc tools\builtin.go:889:1
+15 tools Head tools\builtin.go:599:1
+15 tools Cat tools\builtin.go:349:1
+15 tools readUTF16 tools\builtin.go:97:1
+15 shared LoadConfig shared\config.go:82:1
+15 main run cmd\uninstall\main.go:18:1
+14 tools Tree tools\builtin.go:835:1
+14 tools Tail tools\builtin.go:679:1
+14 main printComparison cmd\bench\main.go:456:1
+13 tools grepWithContext tools\grep.go:217:1
+13 tools Write tools\builtin.go:142:1
+
+--- strpatch module ---
+11 main checkRefusals main.go:154:1
+7 main patch main.go:90:1
+6 main readFileWithRetry main.go:211:1
+6 main atomicWrite main.go:126:1
+6 main readInput main.go:68:1
+5 main TestRefusal_FileLocked main_test.go:475:1
+5 main TestHappyPath_LargeFile main_test.go:255:1
+5 main normaliseToCRLF main.go:198:1
+4 main TestHappyPath_NoFinalNewline main_test.go:500:1
+4 main TestRefusal_MissingField main_test.go:417:1

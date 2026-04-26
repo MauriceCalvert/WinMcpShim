@@ -1,0 +1,70 @@
+name: Release
+on:
+  push:
+    tags: ['v*']
+jobs:
+  release:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Build
+        run: |
+          go build -o winmcpshim.exe ./shim
+          cd strpatch
+          go build -o strpatch.exe .
+          cd ..
+          go build -o install.exe ./cmd/install
+          go build -o uninstall.exe ./cmd/uninstall
+      - name: Compute version
+        id: ver
+        shell: powershell
+        run: |
+          $v = "${{ github.ref_name }}".TrimStart('v')
+          "version=$v" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+      - name: Package source zip
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Path release -Force
+          Copy-Item winmcpshim.exe release\
+          Copy-Item strpatch\strpatch.exe release\
+          Copy-Item install.exe release\
+          Copy-Item uninstall.exe release\
+          Copy-Item config.ps1 release\
+          Copy-Item config.cmd release\
+          Copy-Item shim.toml.example release\
+          Copy-Item README.md release\
+          Copy-Item LICENSE release\
+          Set-Location release
+          Get-FileHash *.exe -Algorithm SHA256 | ForEach-Object {
+            "$($_.Hash)  $((Split-Path $_.Path -Leaf))"
+          } | Set-Content SHA256SUMS.txt
+          Compress-Archive -Path * -DestinationPath ..\WinMcpShim-${{ github.ref_name }}.zip
+      - name: Pack MCPB bundle
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Path bundle -Force
+          Copy-Item winmcpshim.exe bundle\
+          Copy-Item strpatch\strpatch.exe bundle\
+          Copy-Item config.ps1 bundle\
+          Copy-Item config.cmd bundle\
+          Copy-Item manifest.json bundle\
+          Copy-Item icon\WinMcpShim.png bundle\icon.png
+          Copy-Item README.md bundle\
+          Copy-Item LICENSE bundle\
+          Copy-Item PRIVACY.md bundle\
+          npx -y @anthropic-ai/mcpb pack bundle "winmcpshim-${{ steps.ver.outputs.version }}.mcpb"
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            WinMcpShim-${{ github.ref_name }}.zip
+            winmcpshim-${{ steps.ver.outputs.version }}.mcpb
+          generate_release_notes: true

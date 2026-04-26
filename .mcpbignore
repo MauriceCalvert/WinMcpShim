@@ -1,0 +1,11 @@
+# Exclude everything by default, whitelist the bundle artefacts.
+*
+
+# Bundle artefacts (whitelisted — these are the only files shipped in the .mcpb)
+!manifest.json
+!WinMcpShim.svg
+!winmcpshim.exe
+!strpatch.exe
+!PRIVACY.md
+!README.md
+!LICENSE

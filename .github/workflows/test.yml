@@ -1,0 +1,33 @@
+name: Test
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - name: Vet
+        run: go vet ./shared/... ./shim/... ./tools/... ./installer/... ./cmd/...
+      - name: Build
+        run: |
+          go build -o winmcpshim.exe ./shim
+          cd strpatch
+          go build -o strpatch.exe .
+      - name: Test shared
+        run: go test -count=1 -timeout 30s -v ./shared
+      - name: Test tools
+        run: go test -count=1 -timeout 60s -v ./tools
+      - name: Test shim
+        run: go test -count=1 -timeout 180s -v ./shim
+      - name: Test installer
+        run: go test -count=1 -timeout 30s -v ./installer
+      - name: Test strpatch
+        run: |
+          cd strpatch
+          go test -count=1 -timeout 30s -v .

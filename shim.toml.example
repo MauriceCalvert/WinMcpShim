@@ -1,0 +1,220 @@
+# WinMcpShim configuration
+# ========================
+#
+# Copy this file to shim.toml (in the same directory as shim.exe)
+# and edit allowed_roots to list directories the shim may access.
+#
+# Requires: Git for Windows (https://gitforwindows.org/) for the
+# configured external tools (grep, sed, awk, sort, xxd, etc.).
+# Built-in tools work without Git.
+
+[security]
+# Directories the shim is allowed to read and write.
+# All path arguments are checked against these roots.
+# Symlinks and NTFS junctions escaping these roots are detected.
+allowed_roots = [
+    "C:\\Users\\YourName\\projects",
+]
+# Maximum inactivity timeout (seconds) Claude can request per tool call.
+max_timeout = 60
+
+[scan_dirs]
+# Directories searched by --scan to discover executables.
+paths = [
+    "C:\\Program Files\\Git\\usr\\bin",
+]
+
+[run]
+# Defaults for the built-in "run" tool.
+inactivity_timeout = 10
+total_timeout = 300
+max_output = 102400
+# Optional allowlist of additional executables for the run tool.
+# Entries are resolved on PATH at startup and matched by absolute path.
+# Bare names (e.g. "git", "powershell") are looked up at startup; the
+# resolved path is what gets matched at call time. Full paths are
+# accepted as-is. Entries that cannot be resolved are dropped with a
+# startup warning. Executables inside allowed_roots are ALWAYS permitted
+# regardless of this list — the list only widens the gate.
+allowed_commands = []
+
+# -----------------------------------------------------------------------
+# Built-in tool descriptions (required — shim refuses to start if missing)
+# -----------------------------------------------------------------------
+
+[builtin_descriptions]
+cat = "Read one or more files in a single call, returning their contents. Pass multiple space-separated absolute paths (quote paths with spaces) or a JSON array of strings. Prefer over 'read' when you need several files at once. Max combined output 512KB."
+copy = "Copy a file or directory tree. Fails if destination already exists. Set recursive=true for directories (required; omitting it errors)."
+delete = "Delete a single file or empty directory. Cannot delete non-empty directories."
+diff = "Compare two text files line by line and show unified diff. Returns empty string if files are identical. Use context_lines to control surrounding context (default 3)."
+edit = "Find-and-replace a unique string in a file. old_text must appear exactly once; errors if not found or ambiguous."
+head = "Show the first N lines of a file (default 10). Lightweight preview without reading the full file."
+info = "Get metadata for a file or directory: type, size in bytes, last-modified (RFC3339), read-only flag. Does not read file content."
+list = "List one directory level (non-recursive). Output: tab-separated name, type, size per line. Use pattern for glob filtering (e.g. *.py)."
+mkdir = "Create a directory and any missing parent directories. Idempotent: succeeds if directory already exists."
+move = "Move or rename a file or directory. Fails if destination already exists."
+read = "Read a single text file (UTF-8/ASCII only; rejects binary/UTF-16). Max 512KB without offset/limit; use offset+limit for partial reads of larger files."
+roots = "Return the list of allowed root directories from config. Use this to discover where you can read and write files."
+run = "Execute a command. Executables inside allowed_roots may always be invoked. If run.allowed_commands is configured, listed commands resolved at startup to absolute PATH locations are also permitted (exact path match)."
+search = "Recursively find files by name glob under a directory tree. Matches filenames only. Returns absolute paths, one per line. Default cap: 100 results."
+tail = "Show the last N lines of a file (default 10). For files over 512KB, reads only the tail portion."
+tree = "Recursive indented directory listing. Use depth to limit traversal (default 3). Use pattern to filter files by glob. Max 500 entries."
+wc = "Count lines, words, and bytes in a text file. Returns lines: N, words: N, bytes: N."
+write = "Create or overwrite a text file. Creates parent directories automatically. Atomic (temp file + rename). Preserves CRLF if the existing file uses CRLF. Set append=true to add to an existing file."
+grep = "Search inside file contents by regex. Uses Go RE2 regex syntax (not GNU grep BRE): unescaped (, ), +, ? are metacharacters. No backreferences. Set recursive=true + include to search a directory tree."
+
+# -----------------------------------------------------------------------
+# Configured external tools (require Git for Windows)
+# -----------------------------------------------------------------------
+# These tools wrap Unix utilities from Git for Windows. They provide
+# rich parameter schemas so Claude uses them correctly. Remove or
+# comment out any tool you don't need.
+#
+# Annotation fields for MCP directory compliance:
+#   title       — human-readable name shown in UI
+#   read_only   — true if tool only reads, never modifies
+#   destructive — true if tool may destructively modify files
+#   idempotent  — true if repeated calls with same args have no extra effect
+# -----------------------------------------------------------------------
+
+# NOTE: grep is always provided by the built-in implementation (Go RE2).
+# Any [tools.grep] section in this file is ignored with a startup warning.
+# The external GNU grep from Git for Windows is an MSYS2 binary that
+# mangles Windows paths under recursive search, so it is forbidden.
+
+[tools.sed]
+exe = "C:\\Program Files\\Git\\usr\\bin\\sed.exe"
+description = "Apply regex substitutions or line-based transforms to a file. Best for multi-site replacements (s/old/new/g) across a file. Set in_place=true to modify the file directly."
+title = "Sed (Stream Editor)"
+read_only = false
+destructive = true
+idempotent = false
+inactivity_timeout = 5
+total_timeout = 15
+max_output = 102400
+success_codes = [0]
+
+[tools.sed.params]
+expression = { type = "string", description = "sed expression (e.g. s/old/new/g)", required = true, flag = "-e" }
+path = { type = "string", description = "Input file path", position = 1 }
+in_place = { type = "boolean", description = "Edit file in place", default = false, flag = "-i" }
+
+[tools.awk]
+exe = "C:\\Program Files\\Git\\usr\\bin\\gawk.exe"
+description = "Extract fields, compute summaries, or reformat structured text. Best for columnar data (CSV, TSV, whitespace-delimited). Set field_separator for non-whitespace delimiters."
+title = "AWK (Text Processing)"
+read_only = true
+destructive = false
+idempotent = true
+inactivity_timeout = 5
+total_timeout = 15
+max_output = 102400
+success_codes = [0]
+
+[tools.awk.params]
+program = { type = "string", description = "AWK program text (e.g. '{print $1, $3}')", required = true, position = 1 }
+path = { type = "string", description = "Input file path", position = 2 }
+field_separator = { type = "string", description = "Input field separator", flag = "-F" }
+
+[tools.sort]
+exe = "C:\\Program Files\\Git\\usr\\bin\\sort.exe"
+description = "Sort lines of a text file alphabetically, numerically, or in reverse. Set unique=true to deduplicate."
+title = "Sort Lines"
+read_only = true
+destructive = false
+idempotent = true
+inactivity_timeout = 5
+total_timeout = 15
+max_output = 102400
+success_codes = [0]
+
+[tools.sort.params]
+path = { type = "string", description = "File path", required = true, position = 1 }
+reverse = { type = "boolean", description = "Reverse sort order", default = false, flag = "-r" }
+numeric = { type = "boolean", description = "Numeric sort", default = false, flag = "-n" }
+unique = { type = "boolean", description = "Remove duplicate lines", default = false, flag = "-u" }
+
+[tools.xxd]
+exe = "C:\\Program Files\\Git\\usr\\bin\\xxd.exe"
+description = "Hex dump of a file. Use to inspect binary content, byte-order marks, or line endings. Set length to limit output."
+title = "Hex Dump"
+read_only = true
+destructive = false
+idempotent = true
+inactivity_timeout = 5
+total_timeout = 10
+max_output = 102400
+success_codes = [0]
+
+[tools.xxd.params]
+path = { type = "string", description = "File path", required = true, position = 1 }
+length = { type = "integer", description = "Number of bytes to dump", flag = "-l" }
+
+[tools.dos2unix]
+exe = "C:\\Program Files\\Git\\usr\\bin\\dos2unix.exe"
+description = "Convert Windows CRLF line endings to Unix LF. Modifies the file in place."
+title = "DOS to Unix Line Endings"
+read_only = false
+destructive = true
+idempotent = true
+inactivity_timeout = 5
+total_timeout = 10
+max_output = 102400
+success_codes = [0]
+
+[tools.dos2unix.params]
+path = { type = "string", description = "File path to convert", required = true, position = 1 }
+
+[tools.cut]
+exe = "C:\\Program Files\\Git\\usr\\bin\\cut.exe"
+description = "Extract specific fields or character positions from each line. Set delimiter and fields (e.g. delimiter=',', fields='1,3') for CSV-like data."
+title = "Cut (Extract Fields)"
+read_only = true
+destructive = false
+idempotent = true
+inactivity_timeout = 5
+total_timeout = 10
+max_output = 102400
+success_codes = [0]
+
+[tools.cut.params]
+path = { type = "string", description = "File path", required = true, position = 1 }
+delimiter = { type = "string", description = "Field delimiter character", flag = "-d" }
+fields = { type = "string", description = "Field numbers to extract (e.g. 1,3 or 2-5)", flag = "-f" }
+
+[tools.uniq]
+exe = "C:\\Program Files\\Git\\usr\\bin\\uniq.exe"
+description = "Remove or count adjacent duplicate lines. Input should be sorted first. Set count=true to prefix lines with occurrence counts."
+title = "Unique Lines"
+read_only = true
+destructive = false
+idempotent = true
+inactivity_timeout = 5
+total_timeout = 10
+max_output = 102400
+success_codes = [0]
+
+[tools.uniq.params]
+path = { type = "string", description = "File path", required = true, position = 1 }
+count = { type = "boolean", description = "Prefix lines by occurrence count", default = false, flag = "-c" }
+duplicates_only = { type = "boolean", description = "Only show duplicate lines", default = false, flag = "-d" }
+
+# Uses Windows 10+ built-in tar.exe (not MSYS2 tar, which mangles drive letters).
+[tools.tar]
+exe = "C:\\Windows\\System32\\tar.exe"
+description = "Create or extract tar archives (.tar, .tar.gz, .tgz). Use working_dir to set the base directory for relative paths inside the archive. Set compress=true for gzip."
+title = "Tar Archive"
+read_only = false
+destructive = true
+idempotent = false
+inactivity_timeout = 10
+total_timeout = 60
+max_output = 102400
+success_codes = [0]
+
+[tools.tar.params]
+operation = { type = "string", description = "Operation: -cf (create), -xf (extract), -tf (list contents)", required = true, position = 1 }
+archive = { type = "string", description = "Archive file path", required = true, position = 2 }
+path = { type = "string", description = "Files/dirs to archive, or extract destination (with -C flag)", position = 3 }
+compress = { type = "boolean", description = "Use gzip compression", default = false, flag = "-z" }
+working_dir = { type = "string", description = "Change to this directory before operating (avoids absolute paths in archive)", flag = "-C" }

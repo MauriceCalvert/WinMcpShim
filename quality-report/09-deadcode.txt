@@ -1,0 +1,323 @@
+﻿EXPORTED SYMBOLS AUDIT
+======================
+
+--- shared/ exported functions ---
+config.go: func DefaultRunConfig() RunConfig {
+config.go: func ConfigPath() string {
+config.go: func LoadConfig(path string) (*Config, error) {
+config.go: func ValidateToolConfigs(tools map[string]ToolConfig) error {
+config.go: func DefaultBuiltinDescriptions() map[string]string {
+critical.go: func CriticalErrorText(msg string) string {
+critical.go: func IsCriticalError(msg string) bool {
+fileinfo_other.go: func FileCreationTime(info os.FileInfo) string {
+fileinfo_windows.go: func FileCreationTime(info os.FileInfo) string {
+helpers.go: func IsNotExist(err error) bool {
+helpers.go: func RequireString(params map[string]interface{}, key string) (string, error) {
+helpers.go: func OptionalBool(params map[string]interface{}, key string) (bool, bool) {
+helpers.go: func OptionalInt(params map[string]interface{}, key string) (int, bool) {
+helpers.go: func OptionalString(params map[string]interface{}, key string) (string, bool) {
+helpers.go: func AtomicWrite(path string, data []byte) error {
+helpers.go: func DetectTextEncoding(header []byte) (TextEncoding, error) {
+helpers.go: func DecodeUTF16(data []byte, enc TextEncoding) (string, error) {
+helpers.go: func CheckTextFile(data []byte) error {
+helpers.go: func NormaliseToCRLF(data []byte) []byte {
+helpers.go: func OpenFileWithRetry(path string) (*os.File, error) {
+helpers.go: func ReadFileWithRetry(path string) ([]byte, error) {
+helpers.go: func StatWithRetry(path string) (os.FileInfo, error) {
+helpers.go: func CopyFile(src, dst string) (string, error) {
+helpers.go: func CopyDir(src, dst string) (string, error) {
+jsonrpc.go: func MakeToolResult(text string, isError bool) json.RawMessage {
+jsonrpc.go: func MakeErrorResponse(id json.RawMessage, code int, message string) *ErrorResponse {
+jsonrpc.go: func MakeSuccessResponse(id json.RawMessage, result json.RawMessage) *Response {
+jsonrpc.go: func RawJSON(s string) json.RawMessage {
+process_other.go: func SetupChildProcess(cmd *exec.Cmd) {}
+process_other.go: func CreateJobObject() (JobHandle, error) { return NoJobHandle, nil }
+process_other.go: func AssignToJobObject(job JobHandle, process *os.Process) error { return nil }
+process_other.go: func CloseJobObject(job JobHandle) {}
+process_windows.go: func SetupChildProcess(cmd *exec.Cmd) {
+process_windows.go: func CreateJobObject() (windows.Handle, error) {
+process_windows.go: func AssignToJobObject(job windows.Handle, process *os.Process) error {
+process_windows.go: func CloseJobObject(job windows.Handle) {
+security.go: func CheckPathConfinement(path string, allowedRoots []string) error {
+security.go: func CheckPathConfinementFull(path string, allowedRoots []string) error {
+security.go: func CheckResolvedPathConfinement(path string, allowedRoots []string) error {
+security.go: func CheckCommandConfinement(command string, allowedRoots []string) error {
+security_other.go: func VerifyPathByHandle(path string, allowedRoots []string) error {
+security_other.go: func VerifyCommandByHandle(path string, allowedRoots []string) error {
+security_windows.go: func VerifyPathByHandle(path string, allowedRoots []string) error {
+security_windows.go: func VerifyCommandByHandle(path string, allowedRoots []string) error {
+sharing_other.go: func IsSharingViolation(err error) bool {
+sharing_windows.go: func IsSharingViolation(err error) bool {
+
+--- shared/ exported types ---
+config.go: type Config struct {
+config.go: type SecurityConfig struct {
+config.go: type ScanDirsConfig struct {
+config.go: type RunConfig struct {
+config.go: type ToolConfig struct {
+config.go: type ParamConfig struct {
+helpers.go: type TextEncoding int
+jsonrpc.go: type Request struct {
+jsonrpc.go: type Response struct {
+jsonrpc.go: type ErrorResponse struct {
+jsonrpc.go: type RPCError struct {
+jsonrpc.go: type ToolResult struct {
+jsonrpc.go: type ContentItem struct {
+jsonrpc.go: type ToolAnnotations struct {
+jsonrpc.go: type ToolSchema struct {
+process_other.go: type JobHandle = uintptr
+process_windows.go: type JobHandle = windows.Handle
+security.go: type ConfinementError struct {
+
+--- tools/ exported functions ---
+builtin.go: func Read(params map[string]interface{}, allowedRoots []string) (string, error) {
+builtin.go: func readRange(f *os.File, path string, fileSize int64, offset int, limit int, hasLimit bool) (string, error) {
+builtin.go: func readUTF16(f *os.File, path string, fileSize int64, enc shared.TextEncoding, offset int, limit int, hasRange bool, hasLimit bool) (string, error) {
+builtin.go: func Write(params map[string]interface{}, allowedRoots []string) (string, error) {
+builtin.go: func Copy(params map[string]interface{}, allowedRoots []string) (string, error) {
+builtin.go: func Move(params map[string]interface{}, allowedRoots []string) (string, error) {
+builtin.go: func Delete(params map[string]interface{}, allowedRoots []string) (string, error) {
+builtin.go: func List(params map[string]interface{}, allowedRoots []string) (string, error) {
+builtin.go: func Search(params map[string]interface{}, allowedRoots []string) (string, error) {
+builtin.go: func Info(params map[string]interface{}, allowedRoots []string) (string, error) {
+builtin.go: func Cat(params map[string]interface{}, allowedRoots []string) (string, error) {
+builtin.go: func splitPaths(s string) []string {
+builtin.go: func Diff(params map[string]interface{}, allowedRoots []string) (string, error) {
+builtin.go: func decodeForDiff(data []byte, name string) (string, error) {
+builtin.go: func unifiedDiff(name1, name2 string, a, b []string, contextLines int) string {
+builtin.go: func Head(params map[string]interface{}, allowedRoots []string) (string, error) {
+builtin.go: func Mkdir(params map[string]interface{}, allowedRoots []string) (string, error) {
+builtin.go: func Roots(cfg *shared.Config) (string, error) {
+builtin.go: func Tail(params map[string]interface{}, allowedRoots []string) (string, error) {
+builtin.go: func tailSmall(content []byte, n int) string {
+builtin.go: func tailSeek(f *os.File, path string, fileSize int64, n int) (string, error) {
+builtin.go: func tailUTF16(f *os.File, path string, fileSize int64, enc shared.TextEncoding, n int) (string, error) {
+builtin.go: func tailFromDecoded(decoded string, n int, dropFirst bool) string {
+builtin.go: func Tree(params map[string]interface{}, allowedRoots []string) (string, error) {
+builtin.go: func Wc(params map[string]interface{}, allowedRoots []string) (string, error) {
+edit.go: func Edit(params map[string]interface{}, allowedRoots []string) (string, error) {
+edit.go: func FindStrpatch() string {
+external.go: func BuildToolSchemas(cfg *shared.Config) (*BuildResult, error) {
+external.go: func BuiltinSchemas(descriptions map[string]string, runDefaultTimeout int, maxTimeout int) ([]shared.ToolSchema, error) {
+external.go: func DispatchExternalTool(name string, cfg shared.ToolConfig, params map[string]interface{}, maxTimeout int) (string, error) {
+external.go: func ExternalToolSchema(name string, cfg shared.ToolConfig, maxTimeout int) shared.ToolSchema {
+grep.go: func Grep(params map[string]interface{}, allowedRoots []string) (string, error) {
+grep.go: func grepFile(path string, prefix string, re *regexp.Regexp, lineNumbers bool, contextLines int, maxResults int, sb *strings.Builder) int {
+grep.go: func grepNoContext(lines []string, prefix string, re *regexp.Regexp, lineNumbers bool, maxResults int, sb *strings.Builder) int {
+grep.go: func grepWithContext(lines []string, prefix string, re *regexp.Regexp, lineNumbers bool, contextLines int, maxResults int, sb *strings.Builder) int {
+grep.go: func formatLine(sb *strings.Builder, prefix string, lineNum int, sep byte, text string, lineNumbers bool) {
+grep.go: func BuiltinGrepSchema(description string) shared.ToolSchema {
+run.go: func Run(params map[string]interface{}, allowedRoots []string, runCfg shared.RunConfig, maxTimeout int) (string, error) {
+run.go: func FormatRunResult(r ExecResult) string {
+run.go: func ClampTimeout(t int, maxTimeout int) int {
+run.go: func ExecuteWithTimeouts(command string, args []string, opts ExecOpts) (ExecResult, error) {
+run.go: func SplitArgs(s string) []string {
+run.go: func ExecuteExternal(name string, toolCfg shared.ToolConfig, args []string, maxTimeout int) (string, error) {
+
+--- Cross-reference: shared.XXX usages in shim/ and tools/ ---
+main.go:27: cfg, err := shared.LoadConfig(shared.ConfigPath())
+main.go:53: scanner.Buffer(make([]byte, 0, shared.MaxLineSize), shared.MaxLineSize)
+main.go:64: var req shared.Request
+main.go:66: resp := shared.MakeErrorResponse(nil, -32700, "Parse error")
+main.go:91: resp := shared.MakeErrorResponse(req.ID, -32601, fmt.Sprintf("Method not found: %s", req.Method))
+main.go:106: func negotiateProtocolVersion(req shared.Request) string {
+main.go:114: return shared.MaxProtocolVersion
+main.go:120: func handleInitialize(req shared.Request, logger *Logger) bool {
+main.go:133: resp := shared.MakeSuccessResponse(req.ID, resultJSON)
+main.go:138: func handleToolsCall(req shared.Request, cfg *shared.Config, builtinOverrides map[string]bool, logger *Logger) (ok bool) {
+main.go:144: resp := shared.MakeSuccessResponse(req.ID, shared.MakeToolResult(shared.CriticalErrorText(msg), true))
+main.go:153: resp := shared.MakeErrorResponse(req.ID, -32602, "Invalid params")
+main.go:213: resp := shared.MakeErrorResponse(req.ID, -32602, fmt.Sprintf("Unknown tool: %s", callParams.Name))
+main.go:219: var ce *shared.ConfinementError
+main.go:221: msg = shared.CriticalErrorText(ce.Message)
+main.go:224: resp := shared.MakeSuccessResponse(req.ID, shared.MakeToolResult(msg, true))
+main.go:227: resp := shared.MakeSuccessResponse(req.ID, shared.MakeToolResult(result, false))
+main.go:232: func handleToolsList(req shared.Request, schemas []shared.ToolSchema, logger *Logger) bool {
+main.go:237: resp := shared.MakeSuccessResponse(req.ID, resultJSON)
+main.go:261: func runScan(cfg *shared.Config) {
+builtin.go:21: path, err := shared.RequireString(params, "path")
+builtin.go:25: if err := shared.CheckPathConfinementFull(path, allowedRoots); err != nil {
+builtin.go:28: info, err := shared.StatWithRetry(path)
+builtin.go:32: offset, hasOffset := shared.OptionalInt(params, "offset")
+builtin.go:33: limit, hasLimit := shared.OptionalInt(params, "limit")
+builtin.go:36: if !hasRange && fileSize > shared.MaxReadSize {
+builtin.go:37: return "", fmt.Errorf("File is %d bytes (limit %d). Use offset/limit to read in parts.", fileSize, shared.MaxReadSize)
+builtin.go:39: f, err := shared.OpenFileWithRetry(path)
+builtin.go:44: headerSize := shared.BinaryScanSize
+builtin.go:56: enc, encErr := shared.DetectTextEncoding(header)
+builtin.go:60: if enc == shared.UTF16LE || enc == shared.UTF16BE {
+builtin.go:97: func readUTF16(f *os.File, path string, fileSize int64, enc shared.TextEncoding, offset int, limit int, hasRange bool, hasLimit bool) (string, error) {
+builtin.go:123: if enc == shared.UTF16LE {
+builtin.go:128: return shared.DecodeUTF16(append(bom, buf...), enc)
+builtin.go:130: if fileSize > int64(shared.MaxReadSize) {
+builtin.go:131: return "", fmt.Errorf("File is %d bytes (limit %d). Use offset/limit to read in parts.", fileSize, shared.MaxReadSize)
+builtin.go:138: return shared.DecodeUTF16(allData[:rn], enc)
+builtin.go:143: path, err := shared.RequireString(params, "path")
+builtin.go:147: if err := shared.CheckPathConfinement(path, allowedRoots); err != nil {
+builtin.go:150: content, err := shared.RequireString(params, "content")
+builtin.go:154: appendMode, _ := shared.OptionalBool(params, "append")
+builtin.go:155: existing, existErr := shared.ReadFileWithRetry(path)
+builtin.go:158: scanLen := shared.CRLFScanSize
+builtin.go:163: } else if existErr != nil && !shared.IsNotExist(existErr) {
+builtin.go:171: output = shared.NormaliseToCRLF(output)
+builtin.go:173: if err := shared.AtomicWrite(path, output); err != nil {
+builtin.go:181: source, err := shared.RequireString(params, "source")
+builtin.go:185: destination, err := shared.RequireString(params, "destination")
+builtin.go:189: if err := shared.CheckPathConfinement(source, allowedRoots); err != nil {
+builtin.go:192: if err := shared.CheckPathConfinement(destination, allowedRoots); err != nil {
+builtin.go:198: recursive, _ := shared.OptionalBool(params, "recursive")
+builtin.go:207: return shared.CopyDir(source, destination)
+builtin.go:209: return shared.CopyFile(source, destination)
+builtin.go:214: source, err := shared.RequireString(params, "source")
+builtin.go:218: destination, err := shared.RequireString(params, "destination")
+builtin.go:222: if err := shared.CheckPathConfinement(source, allowedRoots); err != nil {
+builtin.go:225: if err := shared.CheckPathConfinement(destination, allowedRoots); err != nil {
+builtin.go:239: path, err := shared.RequireString(params, "path")
+builtin.go:243: if err := shared.CheckPathConfinement(path, allowedRoots); err != nil {
+builtin.go:257: path, err := shared.RequireString(params, "path")
+builtin.go:261: if err := shared.CheckPathConfinement(path, allowedRoots); err != nil {
+builtin.go:264: pattern, _ := shared.OptionalString(params, "pattern")
+builtin.go:293: path, err := shared.RequireString(params, "path")
+builtin.go:297: if err := shared.CheckPathConfinement(path, allowedRoots); err != nil {
+builtin.go:300: pattern, err := shared.RequireString(params, "pattern")
+builtin.go:304: maxResults, _ := shared.OptionalInt(params, "max_results")
+builtin.go:306: maxResults = shared.DefaultMaxResults
+builtin.go:327: path, err := shared.RequireString(params, "path")
+builtin.go:331: if err := shared.CheckPathConfinementFull(path, allowedRoots); err != nil {
+builtin.go:343: created := shared.FileCreationTime(info)
+builtin.go:350: pathsRaw, err := shared.RequireString(params, "paths")
+builtin.go:371: if err := shared.CheckPathConfinementFull(p, allowedRoots); err != nil {
+builtin.go:374: data, err := shared.ReadFileWithRetry(p)
+builtin.go:378: enc, encErr := shared.DetectTextEncoding(data)
+builtin.go:385: if enc == shared.UTF16LE || enc == shared.UTF16BE {
+builtin.go:386: decoded, err := shared.DecodeUTF16(data, enc)
+builtin.go:394: if sb.Len() > shared.MaxReadSize {
+builtin.go:395: return "", fmt.Errorf("combined output exceeds %d bytes", shared.MaxReadSize)
+builtin.go:427: file1, err := shared.RequireString(params, "file1")
+builtin.go:431: file2, err := shared.RequireString(params, "file2")
+builtin.go:435: if err := shared.CheckPathConfinementFull(file1, allowedRoots); err != nil {
+builtin.go:438: if err := shared.CheckPathConfinementFull(file2, allowedRoots); err != nil {
+builtin.go:441: contextLines, hasCtx := shared.OptionalInt(params, "context_lines")
+builtin.go:445: data1, err := shared.ReadFileWithRetry(file1)
+builtin.go:453: data2, err := shared.ReadFileWithRetry(file2)
+builtin.go:468: enc, err := shared.DetectTextEncoding(data)
+builtin.go:472: if enc == shared.UTF16LE || enc == shared.UTF16BE {
+builtin.go:473: decoded, err := shared.DecodeUTF16(data, enc)
+builtin.go:600: path, err := shared.RequireString(params, "path")
+builtin.go:604: if err := shared.CheckPathConfinementFull(path, allowedRoots); err != nil {
+builtin.go:607: n, hasN := shared.OptionalInt(params, "lines")
+builtin.go:611: f, err := shared.OpenFileWithRetry(path)
+builtin.go:617: header := make([]byte, shared.BinaryScanSize)
+builtin.go:620: enc, encErr := shared.DetectTextEncoding(header)
+builtin.go:624: if enc == shared.UTF16LE || enc == shared.UTF16BE {
+builtin.go:627: data, err := io.ReadAll(io.LimitReader(f, int64(shared.MaxReadSize)))
+builtin.go:631: decoded, err := shared.DecodeUTF16(data, enc)
+builtin.go:657: path, err := shared.RequireString(params, "path")
+builtin.go:661: if err := shared.CheckPathConfinement(path, allowedRoots); err != nil {
+builtin.go:671: func Roots(cfg *shared.Config) (string, error) {
+builtin.go:680: path, err := shared.RequireString(params, "path")
+builtin.go:684: if err := shared.CheckPathConfinementFull(path, allowedRoots); err != nil {
+builtin.go:687: n, hasN := shared.OptionalInt(params, "lines")
+builtin.go:691: info, err := shared.StatWithRetry(path)
+builtin.go:695: f, err := shared.OpenFileWithRetry(path)
+builtin.go:701: headerBuf := make([]byte, shared.BinaryScanSize)
+builtin.go:702: if int64(shared.BinaryScanSize) > fileSize {
+builtin.go:707: enc, encErr := shared.DetectTextEncoding(headerBuf)
+builtin.go:711: if enc == shared.UTF16LE || enc == shared.UTF16BE {
+builtin.go:714: if fileSize <= int64(shared.MaxReadSize) {
+builtin.go:719: if err := shared.CheckTextFile(data); err != nil {
+builtin.go:751: if err := shared.CheckTextFile(data); err != nil {
+builtin.go:768: func tailUTF16(f *os.File, path string, fileSize int64, enc shared.TextEncoding, n int) (string, error) {
+builtin.go:769: if fileSize <= int64(shared.MaxReadSize) {
+builtin.go:775: decoded, err := shared.DecodeUTF16(data, enc)
+builtin.go:797: decoded, err := shared.DecodeUTF16(data, enc)
+builtin.go:804: if enc == shared.UTF16LE {
+builtin.go:809: decoded, err := shared.DecodeUTF16(append(bom, data...), enc)
+builtin.go:836: path, err := shared.RequireString(params, "path")
+builtin.go:840: if err := shared.CheckPathConfinement(path, allowedRoots); err != nil {
+builtin.go:843: maxDepth, hasDepth := shared.OptionalInt(params, "depth")
+builtin.go:847: pattern, _ := shared.OptionalString(params, "pattern")
+builtin.go:890: path, err := shared.RequireString(params, "path")
+builtin.go:894: if err := shared.CheckPathConfinementFull(path, allowedRoots); err != nil {
+builtin.go:897: f, err := shared.OpenFileWithRetry(path)
+builtin.go:903: header := make([]byte, shared.BinaryScanSize)
+builtin.go:906: enc, encErr := shared.DetectTextEncoding(header)
+builtin.go:910: if enc == shared.UTF16LE || enc == shared.UTF16BE {
+builtin.go:913: data, err := io.ReadAll(io.LimitReader(f, int64(shared.MaxReadSize)))
+builtin.go:917: decoded, err := shared.DecodeUTF16(data, enc)
+edit.go:16: path, err := shared.RequireString(params, "path")
+edit.go:20: if err := shared.CheckPathConfinement(path, allowedRoots); err != nil {
+edit.go:23: oldText, err := shared.RequireString(params, "old_text")
+edit.go:27: newText, err := shared.RequireString(params, "new_text")
+external.go:14: Schemas        []shared.ToolSchema
+external.go:21: func BuildToolSchemas(cfg *shared.Config) (*BuildResult, error) {
+external.go:57: func BuiltinSchemas(descriptions map[string]string, runDefaultTimeout int, maxTimeout int) ([]shared.ToolSchema, error) {
+external.go:61: annotations *shared.ToolAnnotations
+external.go:72: }`, &shared.ToolAnnotations{
+external.go:87: }`, &shared.ToolAnnotations{
+external.go:102: }`, &shared.ToolAnnotations{
+external.go:117: }`, &shared.ToolAnnotations{
+external.go:131: }`, &shared.ToolAnnotations{
+external.go:144: }`, &shared.ToolAnnotations{
+external.go:158: }`, &shared.ToolAnnotations{
+external.go:173: }`, &shared.ToolAnnotations{
+external.go:186: }`, &shared.ToolAnnotations{
+external.go:201: }`, &shared.ToolAnnotations{
+external.go:215: }`, &shared.ToolAnnotations{
+external.go:228: }`, &shared.ToolAnnotations{
+external.go:241: }`, &shared.ToolAnnotations{
+external.go:251: }`, &shared.ToolAnnotations{
+external.go:265: }`, &shared.ToolAnnotations{
+external.go:280: }`, &shared.ToolAnnotations{
+external.go:293: }`, &shared.ToolAnnotations{
+external.go:310: entries = append(entries, entry{"run", runSchema, &shared.ToolAnnotations{
+external.go:317: schemas := make([]shared.ToolSchema, 0, len(entries))
+external.go:323: schemas = append(schemas, shared.ToolSchema{
+external.go:326: InputSchema: shared.RawJSON(e.schema),
+external.go:340: func DispatchExternalTool(name string, cfg shared.ToolConfig, params map[string]interface{}, maxTimeout int) (string, error) {
+external.go:342: if t, ok := shared.OptionalInt(params, "timeout"); ok {
+external.go:420: func ExternalToolSchema(name string, cfg shared.ToolConfig, maxTimeout int) shared.ToolSchema {
+external.go:435: defaultTimeout = shared.DefaultInactivityTimeout
+external.go:453: annotations := &shared.ToolAnnotations{
+external.go:460: return shared.ToolSchema{
+grep.go:17: path, err := shared.RequireString(params, "path")
+grep.go:21: pattern, err := shared.RequireString(params, "pattern")
+grep.go:25: recursive, _ := shared.OptionalBool(params, "recursive")
+grep.go:26: ignoreCase, _ := shared.OptionalBool(params, "ignore_case")
+grep.go:28: if ln, hasLN := shared.OptionalBool(params, "line_numbers"); hasLN {
+grep.go:31: include, _ := shared.OptionalString(params, "include")
+grep.go:32: contextLines, _ := shared.OptionalInt(params, "context")
+grep.go:36: maxResults, hasMax := shared.OptionalInt(params, "max_results")
+grep.go:53: info, err := shared.StatWithRetry(path)
+grep.go:63: if err := shared.CheckPathConfinementFull(path, allowedRoots); err != nil {
+grep.go:74: if err := shared.CheckPathConfinement(path, allowedRoots); err != nil {
+grep.go:99: if shared.CheckPathConfinementFull(fp, allowedRoots) != nil {
+grep.go:131: if shared.CheckPathConfinementFull(p, allowedRoots) != nil {
+grep.go:149: f, err := shared.OpenFileWithRetry(path)
+grep.go:156: header := make([]byte, shared.BinaryScanSize)
+grep.go:163: enc, encErr := shared.DetectTextEncoding(header)
+grep.go:170: if enc == shared.UTF16LE || enc == shared.UTF16BE {
+grep.go:173: data, err := io.ReadAll(io.LimitReader(f, int64(shared.MaxReadSize)))
+grep.go:177: decoded, err := shared.DecodeUTF16(data, enc)
+grep.go:295: func BuiltinGrepSchema(description string) shared.ToolSchema {
+grep.go:296: return shared.ToolSchema{
+grep.go:299: InputSchema: shared.RawJSON(`{
+grep.go:313: Annotations: &shared.ToolAnnotations{
+run.go:33: func Run(params map[string]interface{}, allowedRoots []string, runCfg shared.RunConfig, maxTimeout int) (string, error) {
+run.go:34: command, err := shared.RequireString(params, "command")
+run.go:38: if err := shared.CheckCommandConfinement(command, allowedRoots); err != nil {
+run.go:41: argsStr, _ := shared.OptionalString(params, "args")
+run.go:47: if t, ok := shared.OptionalInt(params, "timeout"); ok {
+run.go:103: shared.SetupChildProcess(cmd)
+run.go:116: job, _ := shared.CreateJobObject()
+run.go:117: if job != shared.NoJobHandle {
+run.go:118: if err := shared.AssignToJobObject(job, cmd.Process); err != nil {
+run.go:119: shared.CloseJobObject(job)
+run.go:120: job = shared.NoJobHandle
+run.go:124: defer func() { shared.CloseJobObject(job) }()
+run.go:212: shared.CloseJobObject(job)
+run.go:213: job = shared.NoJobHandle
+run.go:310: func ExecuteExternal(name string, toolCfg shared.ToolConfig, args []string, maxTimeout int) (string, error) {
+run.go:313: inactivity = time.Duration(shared.DefaultInactivityTimeout) * time.Second
+run.go:317: total = time.Duration(shared.DefaultTotalTimeout) * time.Second
+run.go:321: maxOutput = shared.DefaultMaxOutput

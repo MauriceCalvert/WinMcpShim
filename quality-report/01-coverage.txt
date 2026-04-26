@@ -1,0 +1,153 @@
+﻿--- Shim (integration) ---
+ok  	github.com/MauriceCalvert/WinMcpShim/shim	45.548s	coverage: 2.4% of statements
+
+--- Tools ---
+ok  	github.com/MauriceCalvert/WinMcpShim/tools	2.491s	coverage: 87.1% of statements
+
+--- Shared ---
+ok  	github.com/MauriceCalvert/WinMcpShim/shared	0.466s	coverage: 73.3% of statements
+
+--- Installer ---
+ok  	github.com/MauriceCalvert/WinMcpShim/installer	0.667s	coverage: 70.7% of statements
+
+--- Strpatch ---
+PASS
+coverage: 4.8% of statements
+ok  	strpatch	2.409s
+
+============================================
+BINARY COVERAGE (shim subprocess via GOCOVERDIR)
+============================================
+
+Real coverage of shim/tools/shared as exercised by integration tests:
+
+github.com/MauriceCalvert/WinMcpShim/shared/config.go:64:		DefaultRunConfig		100.0%
+github.com/MauriceCalvert/WinMcpShim/shared/config.go:73:		ConfigPath			75.0%
+github.com/MauriceCalvert/WinMcpShim/shared/config.go:82:		LoadConfig			92.0%
+github.com/MauriceCalvert/WinMcpShim/shared/config.go:127:		ValidateToolConfigs		77.8%
+github.com/MauriceCalvert/WinMcpShim/shared/config.go:144:		DefaultBuiltinDescriptions	100.0%
+github.com/MauriceCalvert/WinMcpShim/shared/critical.go:9:		CriticalErrorText		100.0%
+github.com/MauriceCalvert/WinMcpShim/shared/critical.go:17:		IsCriticalError			0.0%
+github.com/MauriceCalvert/WinMcpShim/shared/fileinfo_windows.go:12:	FileCreationTime		71.4%
+github.com/MauriceCalvert/WinMcpShim/shared/helpers.go:17:		IsNotExist			100.0%
+github.com/MauriceCalvert/WinMcpShim/shared/helpers.go:25:		RequireString			71.4%
+github.com/MauriceCalvert/WinMcpShim/shared/helpers.go:38:		OptionalBool			100.0%
+github.com/MauriceCalvert/WinMcpShim/shared/helpers.go:48:		OptionalInt			71.4%
+github.com/MauriceCalvert/WinMcpShim/shared/helpers.go:63:		OptionalString			100.0%
+github.com/MauriceCalvert/WinMcpShim/shared/helpers.go:73:		AtomicWrite			63.2%
+github.com/MauriceCalvert/WinMcpShim/shared/helpers.go:116:		DetectTextEncoding		90.9%
+github.com/MauriceCalvert/WinMcpShim/shared/helpers.go:138:		DecodeUTF16			23.8%
+github.com/MauriceCalvert/WinMcpShim/shared/helpers.go:171:		CheckTextFile			77.8%
+github.com/MauriceCalvert/WinMcpShim/shared/helpers.go:188:		NormaliseToCRLF			100.0%
+github.com/MauriceCalvert/WinMcpShim/shared/helpers.go:201:		OpenFileWithRetry		63.6%
+github.com/MauriceCalvert/WinMcpShim/shared/helpers.go:221:		ReadFileWithRetry		63.6%
+github.com/MauriceCalvert/WinMcpShim/shared/helpers.go:241:		StatWithRetry			63.6%
+github.com/MauriceCalvert/WinMcpShim/shared/helpers.go:261:		CopyFile			66.7%
+github.com/MauriceCalvert/WinMcpShim/shared/helpers.go:293:		CopyDir				77.8%
+github.com/MauriceCalvert/WinMcpShim/shared/jsonrpc.go:66:		MakeToolResult			100.0%
+github.com/MauriceCalvert/WinMcpShim/shared/jsonrpc.go:76:		MakeErrorResponse		100.0%
+github.com/MauriceCalvert/WinMcpShim/shared/jsonrpc.go:85:		MakeSuccessResponse		100.0%
+github.com/MauriceCalvert/WinMcpShim/shared/jsonrpc.go:94:		RawJSON				80.0%
+github.com/MauriceCalvert/WinMcpShim/shared/process_windows.go:19:	SetupChildProcess		100.0%
+github.com/MauriceCalvert/WinMcpShim/shared/process_windows.go:26:	CreateJobObject			66.7%
+github.com/MauriceCalvert/WinMcpShim/shared/process_windows.go:50:	AssignToJobObject		80.0%
+github.com/MauriceCalvert/WinMcpShim/shared/process_windows.go:60:	CloseJobObject			100.0%
+github.com/MauriceCalvert/WinMcpShim/shared/security.go:17:		Error				100.0%
+github.com/MauriceCalvert/WinMcpShim/shared/security.go:23:		CheckPathConfinement		66.7%
+github.com/MauriceCalvert/WinMcpShim/shared/security.go:33:		CheckPathConfinementFull	100.0%
+github.com/MauriceCalvert/WinMcpShim/shared/security.go:47:		CheckResolvedPathConfinement	87.5%
+github.com/MauriceCalvert/WinMcpShim/shared/security.go:73:		CheckCommandConfinement		77.8%
+github.com/MauriceCalvert/WinMcpShim/shared/security_windows.go:15:	VerifyPathByHandle		81.2%
+github.com/MauriceCalvert/WinMcpShim/shared/security_windows.go:41:	VerifyCommandByHandle		100.0%
+github.com/MauriceCalvert/WinMcpShim/shared/sharing_windows.go:11:	IsSharingViolation		0.0%
+github.com/MauriceCalvert/WinMcpShim/shim/lock_test_windows.go:21:	lockFileWindows			0.0%
+github.com/MauriceCalvert/WinMcpShim/shim/logging.go:22:		NewLogger			87.5%
+github.com/MauriceCalvert/WinMcpShim/shim/logging.go:46:		Close				100.0%
+github.com/MauriceCalvert/WinMcpShim/shim/logging.go:58:		Enabled				100.0%
+github.com/MauriceCalvert/WinMcpShim/shim/logging.go:63:		Log				100.0%
+github.com/MauriceCalvert/WinMcpShim/shim/main.go:21:			main				100.0%
+github.com/MauriceCalvert/WinMcpShim/shim/main.go:25:			shimMain			80.0%
+github.com/MauriceCalvert/WinMcpShim/shim/main.go:106:			negotiateProtocolVersion	83.3%
+github.com/MauriceCalvert/WinMcpShim/shim/main.go:120:			handleInitialize		100.0%
+github.com/MauriceCalvert/WinMcpShim/shim/main.go:138:			handleToolsCall			80.7%
+github.com/MauriceCalvert/WinMcpShim/shim/main.go:232:			handleToolsList			100.0%
+github.com/MauriceCalvert/WinMcpShim/shim/main.go:242:			parseFlags			100.0%
+github.com/MauriceCalvert/WinMcpShim/shim/main.go:261:			runScan				70.0%
+github.com/MauriceCalvert/WinMcpShim/shim/main.go:280:			sendWarningNotification		0.0%
+github.com/MauriceCalvert/WinMcpShim/shim/main.go:298:			sendCriticalNotification	100.0%
+github.com/MauriceCalvert/WinMcpShim/shim/main.go:315:			writeAndLog			72.7%
+github.com/MauriceCalvert/WinMcpShim/tools/builtin.go:20:		Read				92.9%
+github.com/MauriceCalvert/WinMcpShim/tools/builtin.go:79:		readRange			81.8%
+github.com/MauriceCalvert/WinMcpShim/tools/builtin.go:97:		readUTF16			20.0%
+github.com/MauriceCalvert/WinMcpShim/tools/builtin.go:142:		Write				80.8%
+github.com/MauriceCalvert/WinMcpShim/tools/builtin.go:180:		Copy				76.2%
+github.com/MauriceCalvert/WinMcpShim/tools/builtin.go:213:		Move				66.7%
+github.com/MauriceCalvert/WinMcpShim/tools/builtin.go:238:		Delete				70.0%
+github.com/MauriceCalvert/WinMcpShim/tools/builtin.go:256:		List				83.3%
+github.com/MauriceCalvert/WinMcpShim/tools/builtin.go:292:		Search				81.8%
+github.com/MauriceCalvert/WinMcpShim/tools/builtin.go:326:		Info				78.6%
+github.com/MauriceCalvert/WinMcpShim/tools/builtin.go:349:		Cat				67.6%
+github.com/MauriceCalvert/WinMcpShim/tools/builtin.go:402:		splitPaths			93.3%
+github.com/MauriceCalvert/WinMcpShim/tools/builtin.go:426:		Diff				71.4%
+github.com/MauriceCalvert/WinMcpShim/tools/builtin.go:467:		decodeForDiff			44.4%
+github.com/MauriceCalvert/WinMcpShim/tools/builtin.go:483:		unifiedDiff			97.2%
+github.com/MauriceCalvert/WinMcpShim/tools/builtin.go:599:		Head				57.9%
+github.com/MauriceCalvert/WinMcpShim/tools/builtin.go:656:		Mkdir				75.0%
+github.com/MauriceCalvert/WinMcpShim/tools/builtin.go:671:		Roots				66.7%
+github.com/MauriceCalvert/WinMcpShim/tools/builtin.go:679:		Tail				79.4%
+github.com/MauriceCalvert/WinMcpShim/tools/builtin.go:728:		tailSmall			66.7%
+github.com/MauriceCalvert/WinMcpShim/tools/builtin.go:740:		tailSeek			77.8%
+github.com/MauriceCalvert/WinMcpShim/tools/builtin.go:768:		tailUTF16			0.0%
+github.com/MauriceCalvert/WinMcpShim/tools/builtin.go:817:		tailFromDecoded			0.0%
+github.com/MauriceCalvert/WinMcpShim/tools/builtin.go:835:		Tree				86.8%
+github.com/MauriceCalvert/WinMcpShim/tools/builtin.go:889:		Wc				52.1%
+github.com/MauriceCalvert/WinMcpShim/tools/edit.go:15:			Edit				75.9%
+github.com/MauriceCalvert/WinMcpShim/tools/edit.go:60:			FindStrpatch			54.5%
+github.com/MauriceCalvert/WinMcpShim/tools/external.go:21:		BuildToolSchemas		70.0%
+github.com/MauriceCalvert/WinMcpShim/tools/external.go:57:		BuiltinSchemas			100.0%
+github.com/MauriceCalvert/WinMcpShim/tools/external.go:340:		DispatchExternalTool		61.7%
+github.com/MauriceCalvert/WinMcpShim/tools/external.go:420:		ExternalToolSchema		90.0%
+github.com/MauriceCalvert/WinMcpShim/tools/grep.go:16:			Grep				0.0%
+github.com/MauriceCalvert/WinMcpShim/tools/grep.go:148:			grepFile			0.0%
+github.com/MauriceCalvert/WinMcpShim/tools/grep.go:202:			grepNoContext			0.0%
+github.com/MauriceCalvert/WinMcpShim/tools/grep.go:217:			grepWithContext			0.0%
+github.com/MauriceCalvert/WinMcpShim/tools/grep.go:274:			formatLine			0.0%
+github.com/MauriceCalvert/WinMcpShim/tools/grep.go:295:			BuiltinGrepSchema		100.0%
+github.com/MauriceCalvert/WinMcpShim/tools/run.go:33:			Run				89.5%
+github.com/MauriceCalvert/WinMcpShim/tools/run.go:68:			FormatRunResult			100.0%
+github.com/MauriceCalvert/WinMcpShim/tools/run.go:86:			ClampTimeout			80.0%
+github.com/MauriceCalvert/WinMcpShim/tools/run.go:99:			ExecuteWithTimeouts		89.7%
+github.com/MauriceCalvert/WinMcpShim/tools/run.go:278:			SplitArgs			100.0%
+github.com/MauriceCalvert/WinMcpShim/tools/run.go:310:			ExecuteExternal			67.7%
+total:									(statements)			66.9%
+
+============================================
+UNIT TEST COVERAGE BY FUNCTION
+============================================
+
+--- cover-tools ---
+go : cover: open $path: The system cannot find the file specified.
+At D:\projects\WinMcpShim\quality.ps1:116 char:23
++         $coverLog += (go tool cover -func=$path 2>&1)
++                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (cover: open $pa...file specified.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+--- cover-shared ---
+go : cover: open $path: The system cannot find the file specified.
+At D:\projects\WinMcpShim\quality.ps1:116 char:23
++         $coverLog += (go tool cover -func=$path 2>&1)
++                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (cover: open $pa...file specified.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+--- cover-installer ---
+go : cover: open $path: The system cannot find the file specified.
+At D:\projects\WinMcpShim\quality.ps1:116 char:23
++         $coverLog += (go tool cover -func=$path 2>&1)
++                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (cover: open $pa...file specified.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 

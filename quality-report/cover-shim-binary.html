@@ -1,0 +1,3627 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>shared: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/MauriceCalvert/WinMcpShim/shared/config.go (87.5%)</option>
+				
+				<option value="file1">github.com/MauriceCalvert/WinMcpShim/shared/critical.go (50.0%)</option>
+				
+				<option value="file2">github.com/MauriceCalvert/WinMcpShim/shared/fileinfo_windows.go (71.4%)</option>
+				
+				<option value="file3">github.com/MauriceCalvert/WinMcpShim/shared/helpers.go (67.9%)</option>
+				
+				<option value="file4">github.com/MauriceCalvert/WinMcpShim/shared/jsonrpc.go (90.0%)</option>
+				
+				<option value="file5">github.com/MauriceCalvert/WinMcpShim/shared/process_windows.go (76.5%)</option>
+				
+				<option value="file6">github.com/MauriceCalvert/WinMcpShim/shared/security.go (85.3%)</option>
+				
+				<option value="file7">github.com/MauriceCalvert/WinMcpShim/shared/security_windows.go (82.4%)</option>
+				
+				<option value="file8">github.com/MauriceCalvert/WinMcpShim/shared/sharing_windows.go (0.0%)</option>
+				
+				<option value="file9">github.com/MauriceCalvert/WinMcpShim/shim/lock_test_windows.go (0.0%)</option>
+				
+				<option value="file10">github.com/MauriceCalvert/WinMcpShim/shim/logging.go (93.8%)</option>
+				
+				<option value="file11">github.com/MauriceCalvert/WinMcpShim/shim/main.go (79.8%)</option>
+				
+				<option value="file12">github.com/MauriceCalvert/WinMcpShim/tools/builtin.go (69.0%)</option>
+				
+				<option value="file13">github.com/MauriceCalvert/WinMcpShim/tools/edit.go (70.0%)</option>
+				
+				<option value="file14">github.com/MauriceCalvert/WinMcpShim/tools/external.go (73.5%)</option>
+				
+				<option value="file15">github.com/MauriceCalvert/WinMcpShim/tools/grep.go (0.6%)</option>
+				
+				<option value="file16">github.com/MauriceCalvert/WinMcpShim/tools/run.go (87.7%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package shared
+
+import (
+        "fmt"
+        "os"
+        "path/filepath"
+
+        "github.com/BurntSushi/toml"
+)
+
+// Config is the top-level shim configuration.
+type Config struct {
+        Security            SecurityConfig        `toml:"security"`
+        ScanDirs            ScanDirsConfig        `toml:"scan_dirs"`
+        Run                 RunConfig             `toml:"run"`
+        BuiltinDescriptions map[string]string     `toml:"builtin_descriptions"`
+        Tools               map[string]ToolConfig `toml:"tools"`
+}
+
+// SecurityConfig holds path confinement and safety limit settings.
+type SecurityConfig struct {
+        AllowedRoots []string `toml:"allowed_roots"`
+        MaxTimeout   int      `toml:"max_timeout"`
+}
+
+// ScanDirsConfig holds directories for --scan discovery.
+type ScanDirsConfig struct {
+        Paths []string `toml:"paths"`
+}
+
+// RunConfig holds defaults for the run built-in tool.
+type RunConfig struct {
+        InactivityTimeout int `toml:"inactivity_timeout"`
+        TotalTimeout      int `toml:"total_timeout"`
+        MaxOutput         int `toml:"max_output"`
+}
+
+// ToolConfig defines a configured external tool.
+type ToolConfig struct {
+        Exe               string                 `toml:"exe"`
+        Description       string                 `toml:"description"`
+        InactivityTimeout int                    `toml:"inactivity_timeout"`
+        TotalTimeout      int                    `toml:"total_timeout"`
+        MaxOutput         int                    `toml:"max_output"`
+        SuccessCodes      []int                  `toml:"success_codes"`
+        Params            map[string]ParamConfig `toml:"params"`
+        Title             string                 `toml:"title"`
+        ReadOnly          bool                   `toml:"read_only"`
+        Destructive       bool                   `toml:"destructive"`
+        Idempotent        bool                   `toml:"idempotent"`
+}
+
+// ParamConfig defines a parameter for a configured tool.
+type ParamConfig struct {
+        Type        string      `toml:"type"`
+        Description string      `toml:"description"`
+        Required    bool        `toml:"required"`
+        Default     interface{} `toml:"default"`
+        Flag        string      `toml:"flag"`
+        Position    int         `toml:"position"`
+}
+
+// DefaultRunConfig returns default values for the run tool.
+func DefaultRunConfig() RunConfig <span class="cov8" title="1">{
+        return RunConfig{
+                InactivityTimeout: DefaultInactivityTimeout,
+                TotalTimeout:      DefaultTotalTimeout,
+                MaxOutput:         DefaultMaxOutput,
+        }
+}</span>
+
+// ConfigPath returns the config file path adjacent to the executable.
+func ConfigPath() string <span class="cov8" title="1">{
+        exe, err := os.Executable()
+        if err != nil </span><span class="cov0" title="0">{
+                return "shim.toml"
+        }</span>
+        <span class="cov8" title="1">return filepath.Join(filepath.Dir(exe), "shim.toml")</span>
+}
+
+// LoadConfig loads the TOML config from the given path.
+func LoadConfig(path string) (*Config, error) <span class="cov8" title="1">{
+        data, err := os.ReadFile(path)
+        if err != nil </span><span class="cov8" title="1">{
+                if os.IsNotExist(err) </span><span class="cov8" title="1">{
+                        cfg := &amp;Config{
+                                Run:                 DefaultRunConfig(),
+                                Security:            SecurityConfig{MaxTimeout: DefaultMaxTimeout},
+                                BuiltinDescriptions: DefaultBuiltinDescriptions(),
+                        }
+                        return cfg, nil
+                }</span>
+                <span class="cov0" title="0">return nil, fmt.Errorf("read config %s: %w", path, err)</span>
+        }
+        <span class="cov8" title="1">if len(data) &gt;= 2 </span><span class="cov8" title="1">{
+                if (data[0] == 0xFF &amp;&amp; data[1] == 0xFE) || (data[0] == 0xFE &amp;&amp; data[1] == 0xFF) </span><span class="cov8" title="1">{
+                        return nil, fmt.Errorf("Config file must be saved as UTF-8")
+                }</span>
+        }
+        <span class="cov8" title="1">var cfg Config
+        if _, err := toml.Decode(string(data), &amp;cfg); err != nil </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("parse config %s: %w", path, err)
+        }</span>
+        <span class="cov8" title="1">if cfg.Run.InactivityTimeout == 0 </span><span class="cov8" title="1">{
+                cfg.Run.InactivityTimeout = DefaultInactivityTimeout
+        }</span>
+        <span class="cov8" title="1">if cfg.Run.TotalTimeout == 0 </span><span class="cov8" title="1">{
+                cfg.Run.TotalTimeout = DefaultTotalTimeout
+        }</span>
+        <span class="cov8" title="1">if cfg.Run.MaxOutput == 0 </span><span class="cov8" title="1">{
+                cfg.Run.MaxOutput = DefaultMaxOutput
+        }</span>
+        <span class="cov8" title="1">if cfg.Security.MaxTimeout == 0 </span><span class="cov8" title="1">{
+                cfg.Security.MaxTimeout = DefaultMaxTimeout
+        }</span>
+        <span class="cov8" title="1">if len(cfg.BuiltinDescriptions) == 0 </span><span class="cov8" title="1">{
+                cfg.BuiltinDescriptions = DefaultBuiltinDescriptions()
+        }</span>
+        <span class="cov8" title="1">if err := ValidateToolConfigs(cfg.Tools); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">return &amp;cfg, nil</span>
+}
+
+// ValidateToolConfigs checks that every external tool parameter has exactly
+// one of flag or position, not both and not neither (§6.1).
+func ValidateToolConfigs(tools map[string]ToolConfig) error <span class="cov8" title="1">{
+        for name, tc := range tools </span><span class="cov8" title="1">{
+                for pname, pc := range tc.Params </span><span class="cov8" title="1">{
+                        hasFlag := pc.Flag != ""
+                        hasPos := pc.Position != 0
+                        if hasFlag &amp;&amp; hasPos </span><span class="cov0" title="0">{
+                                return fmt.Errorf("tool %q param %q has both flag and position", name, pname)
+                        }</span>
+                        <span class="cov8" title="1">if !hasFlag &amp;&amp; !hasPos </span><span class="cov0" title="0">{
+                                return fmt.Errorf("tool %q param %q has neither flag nor position", name, pname)
+                        }</span>
+                }
+        }
+        <span class="cov8" title="1">return nil</span>
+}
+
+// DefaultBuiltinDescriptions returns hardcoded descriptions for when no config file exists (§9.13).
+func DefaultBuiltinDescriptions() map[string]string <span class="cov8" title="1">{
+        return map[string]string{
+                "cat":    "Read and concatenate one or more files. Pass multiple space-separated paths or a JSON array.",
+                "copy":   "Copy a file or directory tree.",
+                "delete": "Delete a single file or empty directory.",
+                "diff":   "Compare two text files and show unified diff.",
+                "edit":   "Find-and-replace a unique string in a text file.",
+                "head":   "Show the first N lines of a file (default 10).",
+                "info":   "Get file or directory metadata: size, timestamps, type.",
+                "list":   "List directory contents with optional glob filter.",
+                "mkdir":  "Create a directory (and parent directories).",
+                "move":   "Move or rename a file or directory.",
+                "read":   "Read a text file. Returns content as a string. Use offset/limit for large files.",
+                "roots":  "Return the list of allowed root directories.",
+                "run":    "Execute an arbitrary command. Use timeout to control inactivity limit.",
+                "search": "Recursively search for files matching a glob pattern.",
+                "tail":   "Show the last N lines of a file (default 10).",
+                "tree":   "Recursive indented directory listing with depth limit.",
+                "wc":     "Count lines, words, and bytes in a file.",
+                "write":  "Create or overwrite a text file. Atomic write via temp file + rename.",
+                "grep":   "Search inside file contents by regex. Uses Go RE2 regex syntax (not GNU grep BRE): unescaped (, ), +, ? are metacharacters. No backreferences. Set recursive=true + include to search a directory tree.",
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package shared
+
+import "strings"
+
+const criticalPrefix = "🛑 CRITICAL: "
+
+// CriticalErrorText formats a message as a critical error with instructions
+// for Claude to alert the user (§9.15.2).
+func CriticalErrorText(msg string) string <span class="cov8" title="1">{
+        return criticalPrefix + msg + "\n\n" +
+                "This should never occur during normal operation.\n" +
+                "Please alert the user about this issue immediately.\n" +
+                "Do not retry this operation."
+}</span>
+
+// IsCriticalError returns true if the message starts with the 🛑 CRITICAL: prefix (§9.15.4).
+func IsCriticalError(msg string) bool <span class="cov0" title="0">{
+        return strings.HasPrefix(msg, criticalPrefix)
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">//go:build windows
+
+package shared
+
+import (
+        "os"
+        "syscall"
+        "time"
+)
+
+// FileCreationTime extracts the creation time from a FileInfo on Windows (§5.10).
+func FileCreationTime(info os.FileInfo) string <span class="cov8" title="1">{
+        sys := info.Sys()
+        if sys == nil </span><span class="cov0" title="0">{
+                return info.ModTime().Format(time.RFC3339)
+        }</span>
+        <span class="cov8" title="1">if attr, ok := sys.(*syscall.Win32FileAttributeData); ok </span><span class="cov8" title="1">{
+                created := time.Unix(0, attr.CreationTime.Nanoseconds())
+                return created.Format(time.RFC3339)
+        }</span>
+        <span class="cov0" title="0">return info.ModTime().Format(time.RFC3339)</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package shared
+
+import (
+        "bytes"
+        "encoding/binary"
+        "fmt"
+        "io"
+        "os"
+        "path/filepath"
+        "strings"
+        "time"
+        "unicode/utf16"
+)
+
+// IsNotExist reports whether err indicates a file or path was not found.
+// Falls back to error message matching for Windows compatibility with Go 1.25+.
+func IsNotExist(err error) bool <span class="cov8" title="1">{
+        if os.IsNotExist(err) </span><span class="cov8" title="1">{
+                return true
+        }</span>
+        <span class="cov8" title="1">return strings.Contains(err.Error(), "cannot find")</span>
+}
+
+// RequireString extracts a required string parameter.
+func RequireString(params map[string]interface{}, key string) (string, error) <span class="cov8" title="1">{
+        v, ok := params[key]
+        if !ok </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("missing required parameter: %s", key)
+        }</span>
+        <span class="cov8" title="1">s, ok := v.(string)
+        if !ok </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("parameter %s must be a string", key)
+        }</span>
+        <span class="cov8" title="1">return s, nil</span>
+}
+
+// OptionalBool extracts an optional boolean parameter.
+func OptionalBool(params map[string]interface{}, key string) (bool, bool) <span class="cov8" title="1">{
+        v, ok := params[key]
+        if !ok </span><span class="cov8" title="1">{
+                return false, false
+        }</span>
+        <span class="cov8" title="1">b, ok := v.(bool)
+        return b, ok</span>
+}
+
+// OptionalInt extracts an optional integer parameter.
+func OptionalInt(params map[string]interface{}, key string) (int, bool) <span class="cov8" title="1">{
+        v, ok := params[key]
+        if !ok </span><span class="cov8" title="1">{
+                return 0, false
+        }</span>
+        <span class="cov8" title="1">switch n := v.(type) </span>{
+        case float64:<span class="cov8" title="1">
+                return int(n), true</span>
+        case int:<span class="cov0" title="0">
+                return n, true</span>
+        }
+        <span class="cov0" title="0">return 0, false</span>
+}
+
+// OptionalString extracts an optional string parameter.
+func OptionalString(params map[string]interface{}, key string) (string, bool) <span class="cov8" title="1">{
+        v, ok := params[key]
+        if !ok </span><span class="cov8" title="1">{
+                return "", false
+        }</span>
+        <span class="cov8" title="1">s, ok := v.(string)
+        return s, ok</span>
+}
+
+// AtomicWrite writes data to a temp file then renames over the target (§9.3).
+func AtomicWrite(path string, data []byte) error <span class="cov8" title="1">{
+        dir := filepath.Dir(path)
+        if err := os.MkdirAll(dir, 0755); err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("create directory %s: %w", dir, err)
+        }</span>
+        <span class="cov8" title="1">tmp, err := os.CreateTemp(dir, ".shim-write-*")
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("write %s: %w", path, err)
+        }</span>
+        <span class="cov8" title="1">tmpName := tmp.Name()
+        defer func() </span><span class="cov8" title="1">{
+                if tmpName != "" </span><span class="cov0" title="0">{
+                        os.Remove(tmpName)
+                }</span>
+        }()
+        <span class="cov8" title="1">if _, err := tmp.Write(data); err != nil </span><span class="cov0" title="0">{
+                tmp.Close()
+                return fmt.Errorf("write %s: %w", path, err)
+        }</span>
+        <span class="cov8" title="1">if err := tmp.Close(); err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("write %s: %w", path, err)
+        }</span>
+        <span class="cov8" title="1">if err := os.Rename(tmpName, path); err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("write %s: %w", path, err)
+        }</span>
+        <span class="cov8" title="1">tmpName = ""
+        return nil</span>
+}
+
+// TextEncoding represents the detected encoding of a text file.
+type TextEncoding int
+
+const (
+        // UTF8 is plain UTF-8 (or ASCII).
+        UTF8 TextEncoding = iota
+        // UTF16LE is UTF-16 Little Endian (BOM: FF FE).
+        UTF16LE
+        // UTF16BE is UTF-16 Big Endian (BOM: FE FF).
+        UTF16BE
+)
+
+// DetectTextEncoding detects whether data is UTF-8, UTF-16LE, UTF-16BE, or binary.
+// Returns an error for binary files (null bytes in header with no UTF-16 BOM).
+func DetectTextEncoding(header []byte) (TextEncoding, error) <span class="cov8" title="1">{
+        if len(header) &gt;= 2 </span><span class="cov8" title="1">{
+                if header[0] == 0xFF &amp;&amp; header[1] == 0xFE </span><span class="cov8" title="1">{
+                        return UTF16LE, nil
+                }</span>
+                <span class="cov8" title="1">if header[0] == 0xFE &amp;&amp; header[1] == 0xFF </span><span class="cov0" title="0">{
+                        return UTF16BE, nil
+                }</span>
+        }
+        <span class="cov8" title="1">scanLen := BinaryScanSize
+        if len(header) &lt; scanLen </span><span class="cov8" title="1">{
+                scanLen = len(header)
+        }</span>
+        <span class="cov8" title="1">if bytes.ContainsRune(header[:scanLen], 0) </span><span class="cov8" title="1">{
+                return UTF8, fmt.Errorf("File appears to be binary, not text")
+        }</span>
+        <span class="cov8" title="1">return UTF8, nil</span>
+}
+
+// DecodeUTF16 decodes UTF-16 encoded bytes (after BOM detection) to a UTF-8 string.
+// The 2-byte BOM must be present at the start and is stripped.
+// Returns an error if the data has an odd byte count or contains malformed surrogates.
+func DecodeUTF16(data []byte, enc TextEncoding) (string, error) <span class="cov8" title="1">{
+        if enc != UTF16LE &amp;&amp; enc != UTF16BE </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("DecodeUTF16 called with non-UTF-16 encoding")
+        }</span>
+        <span class="cov8" title="1">if len(data) &lt; 2 </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("UTF-16 data too short for BOM")
+        }</span>
+        // Strip BOM
+        <span class="cov8" title="1">data = data[2:]
+        if len(data)%2 != 0 </span><span class="cov8" title="1">{
+                return "", fmt.Errorf("UTF-16 data has odd byte count (%d bytes after BOM)", len(data))
+        }</span>
+        <span class="cov0" title="0">unitCount := len(data) / 2
+        u16 := make([]uint16, unitCount)
+        var byteOrder binary.ByteOrder
+        if enc == UTF16LE </span><span class="cov0" title="0">{
+                byteOrder = binary.LittleEndian
+        }</span> else<span class="cov0" title="0"> {
+                byteOrder = binary.BigEndian
+        }</span>
+        <span class="cov0" title="0">for i := 0; i &lt; unitCount; i++ </span><span class="cov0" title="0">{
+                u16[i] = byteOrder.Uint16(data[i*2 : i*2+2])
+        }</span>
+        <span class="cov0" title="0">runes := utf16.Decode(u16)
+        var sb strings.Builder
+        sb.Grow(len(runes))
+        for _, r := range runes </span><span class="cov0" title="0">{
+                sb.WriteRune(r)
+        }</span>
+        <span class="cov0" title="0">return sb.String(), nil</span>
+}
+
+// CheckTextFile checks for binary and UTF-16 content (§8.4).
+func CheckTextFile(data []byte) error <span class="cov8" title="1">{
+        if len(data) &gt;= 2 </span><span class="cov8" title="1">{
+                if (data[0] == 0xFF &amp;&amp; data[1] == 0xFE) || (data[0] == 0xFE &amp;&amp; data[1] == 0xFF) </span><span class="cov0" title="0">{
+                        return fmt.Errorf("File is UTF-16 encoded; only UTF-8 and ASCII are supported")
+                }</span>
+        }
+        <span class="cov8" title="1">scanLen := BinaryScanSize
+        if len(data) &lt; scanLen </span><span class="cov8" title="1">{
+                scanLen = len(data)
+        }</span>
+        <span class="cov8" title="1">if bytes.ContainsRune(data[:scanLen], 0) </span><span class="cov0" title="0">{
+                return fmt.Errorf("File appears to be binary, not text")
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+
+// NormaliseToCRLF replaces bare \n (not preceded by \r) with \r\n.
+func NormaliseToCRLF(data []byte) []byte <span class="cov8" title="1">{
+        var result []byte
+        for i := 0; i &lt; len(data); i++ </span><span class="cov8" title="1">{
+                if data[i] == '\n' &amp;&amp; (i == 0 || data[i-1] != '\r') </span><span class="cov8" title="1">{
+                        result = append(result, '\r', '\n')
+                }</span> else<span class="cov8" title="1"> {
+                        result = append(result, data[i])
+                }</span>
+        }
+        <span class="cov8" title="1">return result</span>
+}
+
+// OpenFileWithRetry opens a file for reading with sharing violation retry (§9.2).
+func OpenFileWithRetry(path string) (*os.File, error) <span class="cov8" title="1">{
+        for attempt := 0; attempt &lt;= MaxRetries; attempt++ </span><span class="cov8" title="1">{
+                if attempt &gt; 0 </span><span class="cov0" title="0">{
+                        time.Sleep(RetryBackoffs[attempt-1])
+                }</span>
+                <span class="cov8" title="1">f, err := os.Open(path)
+                if err == nil </span><span class="cov8" title="1">{
+                        return f, nil
+                }</span>
+                <span class="cov8" title="1">if IsNotExist(err) </span><span class="cov8" title="1">{
+                        return nil, fmt.Errorf("File not found: %s", path)
+                }</span>
+                <span class="cov0" title="0">if !IsSharingViolation(err) </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("open %s: %w", path, err)
+                }</span>
+        }
+        <span class="cov0" title="0">return nil, fmt.Errorf("File is locked by another process")</span>
+}
+
+// ReadFileWithRetry reads a file with sharing violation retry (§9.2).
+func ReadFileWithRetry(path string) ([]byte, error) <span class="cov8" title="1">{
+        for attempt := 0; attempt &lt;= MaxRetries; attempt++ </span><span class="cov8" title="1">{
+                if attempt &gt; 0 </span><span class="cov0" title="0">{
+                        time.Sleep(RetryBackoffs[attempt-1])
+                }</span>
+                <span class="cov8" title="1">data, err := os.ReadFile(path)
+                if err == nil </span><span class="cov8" title="1">{
+                        return data, nil
+                }</span>
+                <span class="cov8" title="1">if IsNotExist(err) </span><span class="cov8" title="1">{
+                        return nil, fmt.Errorf("File not found %s: %w", path, err)
+                }</span>
+                <span class="cov0" title="0">if !IsSharingViolation(err) </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("read %s: %w", path, err)
+                }</span>
+        }
+        <span class="cov0" title="0">return nil, fmt.Errorf("File is locked by another process")</span>
+}
+
+// StatWithRetry stats a file with sharing violation retry (§9.2).
+func StatWithRetry(path string) (os.FileInfo, error) <span class="cov8" title="1">{
+        for attempt := 0; attempt &lt;= MaxRetries; attempt++ </span><span class="cov8" title="1">{
+                if attempt &gt; 0 </span><span class="cov0" title="0">{
+                        time.Sleep(RetryBackoffs[attempt-1])
+                }</span>
+                <span class="cov8" title="1">info, err := os.Stat(path)
+                if err == nil </span><span class="cov8" title="1">{
+                        return info, nil
+                }</span>
+                <span class="cov8" title="1">if IsNotExist(err) </span><span class="cov8" title="1">{
+                        return nil, fmt.Errorf("File not found: %s", path)
+                }</span>
+                <span class="cov0" title="0">if !IsSharingViolation(err) </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("stat %s: %w", path, err)
+                }</span>
+        }
+        <span class="cov0" title="0">return nil, fmt.Errorf("File is locked by another process")</span>
+}
+
+// CopyFile copies a single file atomically (§9.3).
+func CopyFile(src, dst string) (string, error) <span class="cov8" title="1">{
+        in, err := os.Open(src)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("copy read %s: %w", src, err)
+        }</span>
+        <span class="cov8" title="1">defer in.Close()
+        dir := filepath.Dir(dst)
+        tmp, err := os.CreateTemp(dir, ".shim-copy-*")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("copy write %s: %w", dst, err)
+        }</span>
+        <span class="cov8" title="1">tmpName := tmp.Name()
+        defer func() </span><span class="cov8" title="1">{
+                if tmpName != "" </span><span class="cov0" title="0">{
+                        os.Remove(tmpName)
+                }</span>
+        }()
+        <span class="cov8" title="1">if _, err := io.Copy(tmp, in); err != nil </span><span class="cov0" title="0">{
+                tmp.Close()
+                return "", fmt.Errorf("copy %s to %s: %w", src, dst, err)
+        }</span>
+        <span class="cov8" title="1">if err := tmp.Close(); err != nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("copy %s to %s: %w", src, dst, err)
+        }</span>
+        <span class="cov8" title="1">if err := os.Rename(tmpName, dst); err != nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("copy %s to %s: %w", src, dst, err)
+        }</span>
+        <span class="cov8" title="1">tmpName = ""
+        return fmt.Sprintf("Copied %s to %s", src, dst), nil</span>
+}
+
+// CopyDir recursively copies a directory tree (§5.5).
+func CopyDir(src, dst string) (string, error) <span class="cov8" title="1">{
+        if err := os.MkdirAll(dst, 0755); err != nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("create %s: %w", dst, err)
+        }</span>
+        <span class="cov8" title="1">count := 0
+        err := filepath.WalkDir(src, func(p string, d os.DirEntry, err error) error </span><span class="cov8" title="1">{
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov8" title="1">rel, _ := filepath.Rel(src, p)
+                target := filepath.Join(dst, rel)
+                if d.IsDir() </span><span class="cov8" title="1">{
+                        return os.MkdirAll(target, 0755)
+                }</span>
+                <span class="cov8" title="1">_, copyErr := CopyFile(p, target)
+                if copyErr != nil </span><span class="cov0" title="0">{
+                        return copyErr
+                }</span>
+                <span class="cov8" title="1">count++
+                return nil</span>
+        })
+        <span class="cov8" title="1">if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">return fmt.Sprintf("Copied %d files from %s to %s", count, src, dst), nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package shared
+
+import (
+        "encoding/json"
+        "fmt"
+)
+
+// Request represents a JSON-RPC 2.0 request.
+type Request struct {
+        JSONRPC string          `json:"jsonrpc"`
+        ID      json.RawMessage `json:"id,omitempty"`
+        Method  string          `json:"method"`
+        Params  json.RawMessage `json:"params,omitempty"`
+}
+
+// Response represents a JSON-RPC 2.0 success response.
+type Response struct {
+        JSONRPC string          `json:"jsonrpc"`
+        ID      json.RawMessage `json:"id"`
+        Result  json.RawMessage `json:"result,omitempty"`
+}
+
+// ErrorResponse represents a JSON-RPC 2.0 error response.
+type ErrorResponse struct {
+        JSONRPC string          `json:"jsonrpc"`
+        ID      json.RawMessage `json:"id"`
+        Error   *RPCError       `json:"error"`
+}
+
+// RPCError is the error object in a JSON-RPC error response.
+type RPCError struct {
+        Code    int    `json:"code"`
+        Message string `json:"message"`
+}
+
+// ToolResult is the MCP tool call result envelope.
+type ToolResult struct {
+        Content []ContentItem `json:"content"`
+        IsError bool          `json:"isError"`
+}
+
+// ContentItem is a single content entry in a tool result.
+type ContentItem struct {
+        Type string `json:"type"`
+        Text string `json:"text"`
+}
+
+// ToolAnnotations describes tool behaviour hints per MCP spec ToolAnnotations.
+type ToolAnnotations struct {
+        Title           string `json:"title"`
+        ReadOnlyHint    bool   `json:"readOnlyHint"`
+        DestructiveHint bool   `json:"destructiveHint"`
+        IdempotentHint  bool   `json:"idempotentHint"`
+        OpenWorldHint   bool   `json:"openWorldHint"`
+}
+
+// ToolSchema is the MCP tool declaration for tools/list.
+type ToolSchema struct {
+        Name        string           `json:"name"`
+        Description string           `json:"description"`
+        InputSchema json.RawMessage  `json:"inputSchema"`
+        Annotations *ToolAnnotations `json:"annotations,omitempty"`
+}
+
+// MakeToolResult creates a ToolResult as json.RawMessage.
+func MakeToolResult(text string, isError bool) json.RawMessage <span class="cov8" title="1">{
+        tr := ToolResult{
+                Content: []ContentItem{{Type: "text", Text: text}},
+                IsError: isError,
+        }
+        data, _ := json.Marshal(tr)
+        return data
+}</span>
+
+// MakeErrorResponse creates a JSON-RPC level error response.
+func MakeErrorResponse(id json.RawMessage, code int, message string) *ErrorResponse <span class="cov8" title="1">{
+        return &amp;ErrorResponse{
+                JSONRPC: "2.0",
+                ID:      id,
+                Error:   &amp;RPCError{Code: code, Message: message},
+        }
+}</span>
+
+// MakeSuccessResponse creates a JSON-RPC success response with a tool result.
+func MakeSuccessResponse(id json.RawMessage, result json.RawMessage) *Response <span class="cov8" title="1">{
+        return &amp;Response{
+                JSONRPC: "2.0",
+                ID:      id,
+                Result:  result,
+        }
+}</span>
+
+// RawJSON compacts a JSON string into a json.RawMessage.
+func RawJSON(s string) json.RawMessage <span class="cov8" title="1">{
+        var buf json.RawMessage
+        if err := json.Unmarshal([]byte(s), &amp;buf); err != nil </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("invalid built-in schema JSON: %v", err))</span>
+        }
+        <span class="cov8" title="1">compact, _ := json.Marshal(buf)
+        return compact</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">//go:build windows
+
+package shared
+
+import (
+        "fmt"
+        "os"
+        "os/exec"
+        "syscall"
+        "unsafe"
+
+        "golang.org/x/sys/windows"
+)
+
+// CreateDefaultErrorMode prevents WER dialogs from appearing when a child crashes (§9.8).
+const CreateDefaultErrorMode = 0x04000000
+
+// SetupChildProcess configures WER suppression on the child (§9.8).
+func SetupChildProcess(cmd *exec.Cmd) <span class="cov8" title="1">{
+        cmd.SysProcAttr = &amp;syscall.SysProcAttr{
+                CreationFlags: CreateDefaultErrorMode,
+        }
+}</span>
+
+// CreateJobObject creates a Job Object with KILL_ON_JOB_CLOSE (§9.8).
+func CreateJobObject() (windows.Handle, error) <span class="cov8" title="1">{
+        job, err := windows.CreateJobObject(nil, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                return 0, fmt.Errorf("CreateJobObject: %w", err)
+        }</span>
+        <span class="cov8" title="1">info := windows.JOBOBJECT_EXTENDED_LIMIT_INFORMATION{
+                BasicLimitInformation: windows.JOBOBJECT_BASIC_LIMIT_INFORMATION{
+                        LimitFlags: windows.JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE,
+                },
+        }
+        _, err = windows.SetInformationJobObject(
+                job,
+                windows.JobObjectExtendedLimitInformation,
+                uintptr(unsafe.Pointer(&amp;info)),
+                uint32(unsafe.Sizeof(info)),
+        )
+        if err != nil </span><span class="cov0" title="0">{
+                windows.CloseHandle(job)
+                return 0, fmt.Errorf("SetInformationJobObject: %w", err)
+        }</span>
+        <span class="cov8" title="1">return job, nil</span>
+}
+
+// AssignToJobObject assigns a process to the job object (§9.8).
+func AssignToJobObject(job windows.Handle, process *os.Process) error <span class="cov8" title="1">{
+        ph, err := windows.OpenProcess(windows.PROCESS_SET_QUOTA|windows.PROCESS_TERMINATE, false, uint32(process.Pid))
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("OpenProcess for job assignment: %w", err)
+        }</span>
+        <span class="cov8" title="1">defer windows.CloseHandle(ph)
+        return windows.AssignProcessToJobObject(job, ph)</span>
+}
+
+// CloseJobObject closes the job object handle, killing all processes in the job (§9.8).
+func CloseJobObject(job windows.Handle) <span class="cov8" title="1">{
+        if job != 0 </span><span class="cov8" title="1">{
+                windows.CloseHandle(job)
+        }</span>
+}
+
+// JobHandle is the platform-specific type for a job object handle.
+type JobHandle = windows.Handle
+
+// NoJobHandle is the zero value indicating no job object.
+const NoJobHandle JobHandle = 0
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package shared
+
+import (
+        "fmt"
+        "os/exec"
+        "path/filepath"
+        "strings"
+)
+
+// ConfinementError is returned by path confinement checks (§9.15.1).
+// IsCritical is true only for post-check failures (symlink/junction escape).
+type ConfinementError struct {
+        Message    string
+        IsCritical bool
+}
+
+func (e *ConfinementError) Error() string <span class="cov8" title="1">{
+        return e.Message
+}</span>
+
+// CheckPathConfinement performs the pre-check: verify that the cleaned absolute
+// path falls within an allowed root (§8.1 step 1).
+func CheckPathConfinement(path string, allowedRoots []string) error <span class="cov8" title="1">{
+        if len(allowedRoots) == 0 </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov8" title="1">return CheckResolvedPathConfinement(path, allowedRoots)</span>
+}
+
+// CheckPathConfinementFull performs both pre-check and post-check (§8.1, §9.15.1).
+// Pre-check failures return a normal error. Post-check failures (symlink/junction escape)
+// return a ConfinementError with IsCritical=true.
+func CheckPathConfinementFull(path string, allowedRoots []string) error <span class="cov8" title="1">{
+        if err := CheckPathConfinement(path, allowedRoots); err != nil </span><span class="cov8" title="1">{
+                return err
+        }</span>
+        <span class="cov8" title="1">if err := VerifyPathByHandle(path, allowedRoots); err != nil </span><span class="cov8" title="1">{
+                return &amp;ConfinementError{
+                        Message:    "path confinement breach: " + path + " escapes allowed roots via symlink/junction",
+                        IsCritical: true,
+                }
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+
+// CheckResolvedPathConfinement checks whether a resolved path is within allowed roots.
+func CheckResolvedPathConfinement(path string, allowedRoots []string) error <span class="cov8" title="1">{
+        canonical, err := filepath.Abs(path)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("resolve path %s: %w", path, err)
+        }</span>
+        <span class="cov8" title="1">canonical = filepath.Clean(canonical)
+        canonicalLower := strings.ToLower(canonical)
+        for _, root := range allowedRoots </span><span class="cov8" title="1">{
+                rootAbs, err := filepath.Abs(root)
+                if err != nil </span><span class="cov0" title="0">{
+                        continue</span>
+                }
+                <span class="cov8" title="1">rootAbs = filepath.Clean(rootAbs)
+                rootLower := strings.ToLower(rootAbs)
+                if !strings.HasSuffix(rootLower, string(filepath.Separator)) </span><span class="cov8" title="1">{
+                        rootLower += string(filepath.Separator)
+                }</span>
+                <span class="cov8" title="1">if strings.HasPrefix(canonicalLower, rootLower) || canonicalLower == strings.TrimSuffix(rootLower, string(filepath.Separator)) </span><span class="cov8" title="1">{
+                        return nil
+                }</span>
+        }
+        <span class="cov8" title="1">return fmt.Errorf("Path not within allowed directories: %s\nAllowed roots: %s",
+                path, strings.Join(allowedRoots, ", "))</span>
+}
+
+// CheckCommandConfinement verifies a command is within allowed roots or on PATH (§8.1).
+func CheckCommandConfinement(command string, allowedRoots []string) error <span class="cov8" title="1">{
+        if len(allowedRoots) == 0 </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov8" title="1">if filepath.IsAbs(command) </span><span class="cov8" title="1">{
+                if err := CheckPathConfinement(command, allowedRoots); err != nil </span><span class="cov8" title="1">{
+                        return err
+                }</span>
+                <span class="cov8" title="1">return VerifyCommandByHandle(command, allowedRoots)</span>
+        }
+        <span class="cov8" title="1">if _, err := exec.LookPath(command); err == nil </span><span class="cov8" title="1">{
+                return nil
+        }</span>
+        <span class="cov0" title="0">return fmt.Errorf("Path not within allowed directories: %s\nAllowed roots: %s",
+                command, strings.Join(allowedRoots, ", "))</span>
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">//go:build windows
+
+package shared
+
+import (
+        "fmt"
+        "os"
+        "strings"
+
+        "golang.org/x/sys/windows"
+)
+
+// VerifyPathByHandle opens the path, calls GetFinalPathNameByHandle to resolve
+// all symlinks/junctions, and verifies the resolved path is within allowed roots (§8.1).
+func VerifyPathByHandle(path string, allowedRoots []string) error <span class="cov8" title="1">{
+        if len(allowedRoots) == 0 </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov8" title="1">f, err := os.Open(path)
+        if err != nil </span><span class="cov8" title="1">{
+                if IsNotExist(err) </span><span class="cov8" title="1">{
+                        return nil // Pre-check passed; downstream code handles not-found.
+                }</span>
+                <span class="cov0" title="0">return err</span>
+        }
+        <span class="cov8" title="1">defer f.Close()
+        h := windows.Handle(f.Fd())
+        buf := make([]uint16, 1024)
+        // VOLUME_NAME_DOS = 0x0
+        n, err := windows.GetFinalPathNameByHandle(h, &amp;buf[0], uint32(len(buf)), 0)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("GetFinalPathNameByHandle: %w", err)
+        }</span>
+        <span class="cov8" title="1">realPath := windows.UTF16ToString(buf[:n])
+        realPath = strings.TrimPrefix(realPath, `\\?\`)
+        return CheckResolvedPathConfinement(realPath, allowedRoots)</span>
+}
+
+// VerifyCommandByHandle checks that an absolute command path resolves (after symlinks)
+// to a location within allowed roots (§8.1).
+func VerifyCommandByHandle(path string, allowedRoots []string) error <span class="cov8" title="1">{
+        return VerifyPathByHandle(path, allowedRoots)
+}</span>
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">//go:build windows
+
+package shared
+
+import (
+        "errors"
+        "syscall"
+)
+
+// IsSharingViolation returns true if the error is a Windows sharing violation.
+func IsSharingViolation(err error) bool <span class="cov0" title="0">{
+        var errno syscall.Errno
+        if errors.As(err, &amp;errno) </span><span class="cov0" title="0">{
+                return errno == 32 // ERROR_SHARING_VIOLATION
+        }</span>
+        <span class="cov0" title="0">return false</span>
+}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package main
+
+import (
+        "os"
+        "syscall"
+        "testing"
+        "unsafe"
+)
+
+var (
+        modkernel32     = syscall.NewLazyDLL("kernel32.dll")
+        procLockFileEx  = modkernel32.NewProc("LockFileEx")
+)
+
+const (
+        lockfileExclusiveLock = 0x00000002
+        lockfileFailImmediately = 0x00000001
+)
+
+// lockFileWindows applies an exclusive lock on a file handle.
+func lockFileWindows(t *testing.T, f *os.File) <span class="cov0" title="0">{
+        t.Helper()
+        h := syscall.Handle(f.Fd())
+        ol := new(syscall.Overlapped)
+        r1, _, err := procLockFileEx.Call(
+                uintptr(h),
+                uintptr(lockfileExclusiveLock|lockfileFailImmediately),
+                0,
+                1, 0,
+                uintptr(unsafe.Pointer(ol)),
+        )
+        if r1 == 0 </span><span class="cov0" title="0">{
+                t.Fatalf("LockFileEx failed: %v", err)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package main
+
+import (
+        "bufio"
+        "fmt"
+        "io"
+        "os"
+        "path/filepath"
+        "sync"
+        "time"
+)
+
+// Logger handles --verbose and --log output.
+type Logger struct {
+        mu      sync.Mutex
+        writers []io.Writer
+        file    *os.File
+        bw      *bufio.Writer
+}
+
+// NewLogger creates a logger based on the verbose and logDir flags.
+func NewLogger(verbose bool, logDir string) (*Logger, error) <span class="cov8" title="1">{
+        l := &amp;Logger{}
+        if verbose </span><span class="cov8" title="1">{
+                l.writers = append(l.writers, os.Stderr)
+        }</span>
+        <span class="cov8" title="1">if logDir != "" </span><span class="cov8" title="1">{
+                info, err := os.Stat(logDir)
+                if err != nil || !info.IsDir() </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("log directory does not exist: %s", logDir)
+                }</span>
+                <span class="cov8" title="1">name := time.Now().Format("060102150405") + ".log"
+                path := filepath.Join(logDir, name)
+                f, err := os.Create(path)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("create log file %s: %w", path, err)
+                }</span>
+                <span class="cov8" title="1">l.file = f
+                l.bw = bufio.NewWriter(f)
+                l.writers = append(l.writers, l.bw)</span>
+        }
+        <span class="cov8" title="1">return l, nil</span>
+}
+
+// Close flushes and closes the log file if open.
+func (l *Logger) Close() <span class="cov8" title="1">{
+        l.mu.Lock()
+        defer l.mu.Unlock()
+        if l.bw != nil </span><span class="cov8" title="1">{
+                l.bw.Flush()
+        }</span>
+        <span class="cov8" title="1">if l.file != nil </span><span class="cov8" title="1">{
+                l.file.Close()
+        }</span>
+}
+
+// Enabled returns true if any logging output is configured.
+func (l *Logger) Enabled() bool <span class="cov8" title="1">{
+        return len(l.writers) &gt; 0
+}</span>
+
+// Log writes a tagged message to all configured outputs.
+func (l *Logger) Log(tag, msg string) <span class="cov8" title="1">{
+        if !l.Enabled() </span><span class="cov8" title="1">{
+                return
+        }</span>
+        <span class="cov8" title="1">l.mu.Lock()
+        defer l.mu.Unlock()
+        line := fmt.Sprintf("[shim:%s] %s\n", tag, msg)
+        for _, w := range l.writers </span><span class="cov8" title="1">{
+                w.Write([]byte(line))
+        }</span>
+        <span class="cov8" title="1">if l.bw != nil </span><span class="cov8" title="1">{
+                l.bw.Flush()
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">// winmcpshim.exe — MCP stdio server for file operations and external tools.
+package main
+
+import (
+        "bufio"
+        "encoding/json"
+        "errors"
+        "fmt"
+        "io"
+        "os"
+        "path/filepath"
+        "sync/atomic"
+
+        "github.com/MauriceCalvert/WinMcpShim/shared"
+        "github.com/MauriceCalvert/WinMcpShim/tools"
+)
+
+// shutdownFlag is set to 1 when the shim is shutting down (§9.12).
+var shutdownFlag atomic.Int32
+
+func main() <span class="cov8" title="1">{
+        os.Exit(shimMain())
+}</span>
+
+func shimMain() int <span class="cov8" title="1">{
+        verbose, logDir, scan := parseFlags()
+        cfg, err := shared.LoadConfig(shared.ConfigPath())
+        if err != nil </span><span class="cov8" title="1">{
+                fmt.Fprintf(os.Stderr, "config error: %v\n", err)
+                return 1
+        }</span>
+        <span class="cov8" title="1">if scan </span><span class="cov8" title="1">{
+                runScan(cfg)
+                return 0
+        }</span>
+        <span class="cov8" title="1">logger, err := NewLogger(verbose, logDir)
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Fprintf(os.Stderr, "logging error: %v\n", err)
+                return 1
+        }</span>
+        <span class="cov8" title="1">defer logger.Close()
+        logger.Log("event", "shim started")
+        buildResult, err := tools.BuildToolSchemas(cfg)
+        if err != nil </span><span class="cov8" title="1">{
+                fmt.Fprintf(os.Stderr, "schema error: %v\n", err)
+                return 1
+        }</span>
+        <span class="cov8" title="1">schemas := buildResult.Schemas
+        builtinOverrides := buildResult.BuiltinOverrides
+        // Emit startup warnings as notifications (§ grep fallback)
+        startupWarnings := buildResult.Warnings
+        scanner := bufio.NewScanner(os.Stdin)
+        scanner.Buffer(make([]byte, 0, shared.MaxLineSize), shared.MaxLineSize)
+        warningsEmitted := false
+        for scanner.Scan() </span><span class="cov8" title="1">{
+                if shutdownFlag.Load() != 0 </span><span class="cov0" title="0">{
+                        break</span>
+                }
+                <span class="cov8" title="1">line := scanner.Bytes()
+                if len(line) == 0 </span><span class="cov0" title="0">{
+                        continue</span>
+                }
+                <span class="cov8" title="1">logger.Log("in", string(line))
+                var req shared.Request
+                if err := json.Unmarshal(line, &amp;req); err != nil </span><span class="cov0" title="0">{
+                        resp := shared.MakeErrorResponse(nil, -32700, "Parse error")
+                        if !writeAndLog(os.Stdout, resp, logger) </span><span class="cov0" title="0">{
+                                break</span>
+                        }
+                        <span class="cov0" title="0">continue</span>
+                }
+                <span class="cov8" title="1">switch req.Method </span>{
+                case "initialize":<span class="cov8" title="1">
+                        handleInitialize(req, logger)</span>
+                case "initialized", "notifications/initialized":<span class="cov8" title="1">
+                        logger.Log("event", "initialized notification received")
+                        if !warningsEmitted </span><span class="cov8" title="1">{
+                                for _, w := range startupWarnings </span><span class="cov0" title="0">{
+                                        sendWarningNotification(os.Stdout, w, logger)
+                                }</span>
+                                <span class="cov8" title="1">warningsEmitted = true</span>
+                        }
+                case "tools/list":<span class="cov8" title="1">
+                        handleToolsList(req, schemas, logger)</span>
+                case "tools/call":<span class="cov8" title="1">
+                        handleToolsCall(req, cfg, builtinOverrides, logger)</span>
+                default:<span class="cov8" title="1">
+                        if len(req.ID) == 0 </span><span class="cov8" title="1">{
+                                logger.Log("error", fmt.Sprintf("unknown notification: %s", req.Method))
+                        }</span> else<span class="cov8" title="1"> {
+                                resp := shared.MakeErrorResponse(req.ID, -32601, fmt.Sprintf("Method not found: %s", req.Method))
+                                if !writeAndLog(os.Stdout, resp, logger) </span><span class="cov0" title="0">{
+                                        break</span>
+                                }
+                        }
+                }
+        }
+        <span class="cov8" title="1">if err := scanner.Err(); err != nil </span><span class="cov0" title="0">{
+                logger.Log("event", fmt.Sprintf("stdin error: %v", err))
+        }</span>
+        <span class="cov8" title="1">logger.Log("event", "shim exiting (stdin closed)")
+        return 0</span>
+}
+
+// negotiateProtocolVersion echoes the client's requested version.
+func negotiateProtocolVersion(req shared.Request) string <span class="cov8" title="1">{
+        var params struct {
+                ProtocolVersion string `json:"protocolVersion"`
+        }
+        if req.Params != nil </span><span class="cov8" title="1">{
+                json.Unmarshal(req.Params, &amp;params)
+        }</span>
+        <span class="cov8" title="1">if params.ProtocolVersion == "" </span><span class="cov0" title="0">{
+                return shared.MaxProtocolVersion
+        }</span>
+        <span class="cov8" title="1">return params.ProtocolVersion</span>
+}
+
+// handleInitialize responds to the initialize request.
+func handleInitialize(req shared.Request, logger *Logger) bool <span class="cov8" title="1">{
+        agreed := negotiateProtocolVersion(req)
+        result := map[string]interface{}{
+                "protocolVersion": agreed,
+                "capabilities": map[string]interface{}{
+                        "tools": map[string]interface{}{},
+                },
+                "serverInfo": map[string]interface{}{
+                        "name":    "winmcpshim",
+                        "version": "1.0.0",
+                },
+        }
+        resultJSON, _ := json.Marshal(result)
+        resp := shared.MakeSuccessResponse(req.ID, resultJSON)
+        return writeAndLog(os.Stdout, resp, logger)
+}</span>
+
+// handleToolsCall dispatches a tool call to the appropriate handler (§9.11).
+func handleToolsCall(req shared.Request, cfg *shared.Config, builtinOverrides map[string]bool, logger *Logger) (ok bool) <span class="cov8" title="1">{
+        defer func() </span><span class="cov8" title="1">{
+                if r := recover(); r != nil </span><span class="cov0" title="0">{
+                        msg := fmt.Sprintf("panic in tool handler: %v", r)
+                        logger.Log("error", msg)
+                        sendCriticalNotification(os.Stdout, msg, logger)
+                        resp := shared.MakeSuccessResponse(req.ID, shared.MakeToolResult(shared.CriticalErrorText(msg), true))
+                        ok = writeAndLog(os.Stdout, resp, logger)
+                }</span>
+        }()
+        <span class="cov8" title="1">var callParams struct {
+                Name      string                 `json:"name"`
+                Arguments map[string]interface{} `json:"arguments"`
+        }
+        if err := json.Unmarshal(req.Params, &amp;callParams); err != nil </span><span class="cov0" title="0">{
+                resp := shared.MakeErrorResponse(req.ID, -32602, "Invalid params")
+                return writeAndLog(os.Stdout, resp, logger)
+        }</span>
+        <span class="cov8" title="1">logger.Log("call", fmt.Sprintf("%s %v", callParams.Name, callParams.Arguments))
+        roots := cfg.Security.AllowedRoots
+        maxTimeout := cfg.Security.MaxTimeout
+        var result string
+        var toolErr error
+        switch callParams.Name </span>{
+        case "cat":<span class="cov8" title="1">
+                result, toolErr = tools.Cat(callParams.Arguments, roots)</span>
+        case "copy":<span class="cov8" title="1">
+                result, toolErr = tools.Copy(callParams.Arguments, roots)</span>
+        case "delete":<span class="cov8" title="1">
+                result, toolErr = tools.Delete(callParams.Arguments, roots)</span>
+        case "diff":<span class="cov8" title="1">
+                result, toolErr = tools.Diff(callParams.Arguments, roots)</span>
+        case "edit":<span class="cov8" title="1">
+                result, toolErr = tools.Edit(callParams.Arguments, roots)</span>
+        case "head":<span class="cov8" title="1">
+                result, toolErr = tools.Head(callParams.Arguments, roots)</span>
+        case "info":<span class="cov8" title="1">
+                result, toolErr = tools.Info(callParams.Arguments, roots)</span>
+        case "list":<span class="cov8" title="1">
+                result, toolErr = tools.List(callParams.Arguments, roots)</span>
+        case "mkdir":<span class="cov8" title="1">
+                result, toolErr = tools.Mkdir(callParams.Arguments, roots)</span>
+        case "move":<span class="cov8" title="1">
+                result, toolErr = tools.Move(callParams.Arguments, roots)</span>
+        case "read":<span class="cov8" title="1">
+                result, toolErr = tools.Read(callParams.Arguments, roots)</span>
+        case "roots":<span class="cov8" title="1">
+                result, toolErr = tools.Roots(cfg)</span>
+        case "search":<span class="cov8" title="1">
+                result, toolErr = tools.Search(callParams.Arguments, roots)</span>
+        case "tail":<span class="cov8" title="1">
+                result, toolErr = tools.Tail(callParams.Arguments, roots)</span>
+        case "tree":<span class="cov8" title="1">
+                result, toolErr = tools.Tree(callParams.Arguments, roots)</span>
+        case "wc":<span class="cov8" title="1">
+                result, toolErr = tools.Wc(callParams.Arguments, roots)</span>
+        case "write":<span class="cov8" title="1">
+                result, toolErr = tools.Write(callParams.Arguments, roots)</span>
+        case "grep":<span class="cov8" title="1">
+                if builtinOverrides["grep"] </span><span class="cov0" title="0">{
+                        result, toolErr = tools.Grep(callParams.Arguments, roots)
+                }</span> else<span class="cov8" title="1"> if toolCfg, ok := cfg.Tools["grep"]; ok </span><span class="cov8" title="1">{
+                        logger.Log("spawn", fmt.Sprintf("grep %v", callParams.Arguments))
+                        result, toolErr = tools.DispatchExternalTool("grep", toolCfg, callParams.Arguments, maxTimeout)
+                }</span> else<span class="cov0" title="0"> {
+                        result, toolErr = tools.Grep(callParams.Arguments, roots)
+                }</span>
+        case "run":<span class="cov8" title="1">
+                logger.Log("spawn", fmt.Sprintf("run %v", callParams.Arguments))
+                result, toolErr = tools.Run(callParams.Arguments, roots, cfg.Run, maxTimeout)</span>
+        default:<span class="cov8" title="1">
+                if toolCfg, ok := cfg.Tools[callParams.Name]; ok </span><span class="cov0" title="0">{
+                        logger.Log("spawn", fmt.Sprintf("%s %v", callParams.Name, callParams.Arguments))
+                        result, toolErr = tools.DispatchExternalTool(callParams.Name, toolCfg, callParams.Arguments, maxTimeout)
+                }</span> else<span class="cov8" title="1"> {
+                        resp := shared.MakeErrorResponse(req.ID, -32602, fmt.Sprintf("Unknown tool: %s", callParams.Name))
+                        return writeAndLog(os.Stdout, resp, logger)
+                }</span>
+        }
+        <span class="cov8" title="1">if toolErr != nil </span><span class="cov8" title="1">{
+                msg := toolErr.Error()
+                var ce *shared.ConfinementError
+                if errors.As(toolErr, &amp;ce) &amp;&amp; ce.IsCritical </span><span class="cov8" title="1">{
+                        msg = shared.CriticalErrorText(ce.Message)
+                        sendCriticalNotification(os.Stdout, ce.Message, logger)
+                }</span>
+                <span class="cov8" title="1">resp := shared.MakeSuccessResponse(req.ID, shared.MakeToolResult(msg, true))
+                return writeAndLog(os.Stdout, resp, logger)</span>
+        }
+        <span class="cov8" title="1">resp := shared.MakeSuccessResponse(req.ID, shared.MakeToolResult(result, false))
+        return writeAndLog(os.Stdout, resp, logger)</span>
+}
+
+// handleToolsList responds with all registered tool schemas.
+func handleToolsList(req shared.Request, schemas []shared.ToolSchema, logger *Logger) bool <span class="cov8" title="1">{
+        result := map[string]interface{}{
+                "tools": schemas,
+        }
+        resultJSON, _ := json.Marshal(result)
+        resp := shared.MakeSuccessResponse(req.ID, resultJSON)
+        return writeAndLog(os.Stdout, resp, logger)
+}</span>
+
+// parseFlags parses command-line flags manually.
+func parseFlags() (verbose bool, logDir string, scan bool) <span class="cov8" title="1">{
+        args := os.Args[1:]
+        for i := 0; i &lt; len(args); i++ </span><span class="cov8" title="1">{
+                switch args[i] </span>{
+                case "--verbose":<span class="cov8" title="1">
+                        verbose = true</span>
+                case "--log":<span class="cov8" title="1">
+                        if i+1 &lt; len(args) </span><span class="cov8" title="1">{
+                                i++
+                                logDir = args[i]
+                        }</span>
+                case "--scan":<span class="cov8" title="1">
+                        scan = true</span>
+                }
+        }
+        <span class="cov8" title="1">return</span>
+}
+
+// runScan lists all .exe files in configured scan directories.
+func runScan(cfg *shared.Config) <span class="cov8" title="1">{
+        for _, dir := range cfg.ScanDirs.Paths </span><span class="cov8" title="1">{
+                entries, err := os.ReadDir(dir)
+                if err != nil </span><span class="cov0" title="0">{
+                        fmt.Fprintf(os.Stderr, "scan %s: %v\n", dir, err)
+                        continue</span>
+                }
+                <span class="cov8" title="1">for _, entry := range entries </span><span class="cov8" title="1">{
+                        if entry.IsDir() </span><span class="cov0" title="0">{
+                                continue</span>
+                        }
+                        <span class="cov8" title="1">if filepath.Ext(entry.Name()) == ".exe" </span><span class="cov8" title="1">{
+                                fmt.Printf("%s\\%s\n", dir, entry.Name())
+                        }</span>
+                }
+        }
+}
+
+// sendWarningNotification writes a notifications/message at warning level.
+func sendWarningNotification(w io.Writer, msg string, logger *Logger) <span class="cov0" title="0">{
+        notification := map[string]interface{}{
+                "jsonrpc": "2.0",
+                "method":  "notifications/message",
+                "params": map[string]interface{}{
+                        "level":  "warning",
+                        "logger": "winmcpshim",
+                        "data":   msg,
+                },
+        }
+        data, _ := json.Marshal(notification)
+        logger.Log("out", string(data))
+        w.Write(data)
+        w.Write([]byte("\n"))
+}</span>
+
+// sendCriticalNotification writes a notifications/message at error level (§9.15.3).
+// Sent before the tool error response.
+func sendCriticalNotification(w io.Writer, msg string, logger *Logger) <span class="cov8" title="1">{
+        notification := map[string]interface{}{
+                "jsonrpc": "2.0",
+                "method":  "notifications/message",
+                "params": map[string]interface{}{
+                        "level":  "error",
+                        "logger": "winmcpshim",
+                        "data":   msg,
+                },
+        }
+        data, _ := json.Marshal(notification)
+        logger.Log("out", string(data))
+        w.Write(data)
+        w.Write([]byte("\n"))
+}</span>
+
+// writeAndLog writes a response to stdout and logs it (§9.12).
+func writeAndLog(w *os.File, resp interface{}, logger *Logger) bool <span class="cov8" title="1">{
+        data, _ := json.Marshal(resp)
+        logger.Log("out", string(data))
+        if _, err := w.Write(data); err != nil </span><span class="cov8" title="1">{
+                logger.Log("event", fmt.Sprintf("stdout write error (broken pipe): %v", err))
+                shutdownFlag.Store(1)
+                return false
+        }</span>
+        <span class="cov8" title="1">if _, err := w.Write([]byte("\n")); err != nil </span><span class="cov0" title="0">{
+                logger.Log("event", fmt.Sprintf("stdout write error (broken pipe): %v", err))
+                shutdownFlag.Store(1)
+                return false
+        }</span>
+        <span class="cov8" title="1">return true</span>
+}
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">// Package tools implements all tool handlers for the shim.
+package tools
+
+import (
+        "bufio"
+        "bytes"
+        "encoding/json"
+        "fmt"
+        "io"
+        "os"
+        "path/filepath"
+        "strings"
+        "time"
+        "unicode"
+
+        "github.com/MauriceCalvert/WinMcpShim/shared"
+)
+
+// Read reads a text file with optional offset/limit (§5.2).
+func Read(params map[string]interface{}, allowedRoots []string) (string, error) <span class="cov8" title="1">{
+        path, err := shared.RequireString(params, "path")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">if err := shared.CheckPathConfinementFull(path, allowedRoots); err != nil </span><span class="cov8" title="1">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">info, err := shared.StatWithRetry(path)
+        if err != nil </span><span class="cov8" title="1">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">offset, hasOffset := shared.OptionalInt(params, "offset")
+        limit, hasLimit := shared.OptionalInt(params, "limit")
+        hasRange := (hasOffset &amp;&amp; offset &gt; 0) || (hasLimit &amp;&amp; limit &gt; 0)
+        fileSize := info.Size()
+        if !hasRange &amp;&amp; fileSize &gt; shared.MaxReadSize </span><span class="cov8" title="1">{
+                return "", fmt.Errorf("File is %d bytes (limit %d). Use offset/limit to read in parts.", fileSize, shared.MaxReadSize)
+        }</span>
+        <span class="cov8" title="1">f, err := shared.OpenFileWithRetry(path)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">defer f.Close()
+        headerSize := shared.BinaryScanSize
+        if int64(headerSize) &gt; fileSize </span><span class="cov8" title="1">{
+                headerSize = int(fileSize)
+        }</span>
+        <span class="cov8" title="1">header := make([]byte, headerSize)
+        if headerSize &gt; 0 </span><span class="cov8" title="1">{
+                n, readErr := f.ReadAt(header, 0)
+                header = header[:n]
+                if readErr != nil &amp;&amp; readErr != io.EOF </span><span class="cov8" title="1">{
+                        return "", fmt.Errorf("read header %s: %w", path, readErr)
+                }</span>
+        }
+        <span class="cov8" title="1">enc, encErr := shared.DetectTextEncoding(header)
+        if encErr != nil </span><span class="cov8" title="1">{
+                return "", encErr
+        }</span>
+        <span class="cov8" title="1">if enc == shared.UTF16LE || enc == shared.UTF16BE </span><span class="cov8" title="1">{
+                return readUTF16(f, path, fileSize, enc, offset, limit, hasRange, hasLimit)
+        }</span>
+        <span class="cov8" title="1">bomOffset := 0
+        if len(header) &gt;= 3 &amp;&amp; header[0] == 0xEF &amp;&amp; header[1] == 0xBB &amp;&amp; header[2] == 0xBF </span><span class="cov8" title="1">{
+                bomOffset = 3
+        }</span>
+        <span class="cov8" title="1">if hasRange </span><span class="cov8" title="1">{
+                return readRange(f, path, fileSize, offset+bomOffset, limit, hasLimit)
+        }</span>
+        <span class="cov8" title="1">data := make([]byte, fileSize-int64(bomOffset))
+        n, readErr := f.ReadAt(data, int64(bomOffset))
+        if readErr != nil &amp;&amp; readErr != io.EOF </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("read %s: %w", path, readErr)
+        }</span>
+        <span class="cov8" title="1">return string(data[:n]), nil</span>
+}
+
+// readRange reads a byte range from a UTF-8 file.
+func readRange(f *os.File, path string, fileSize int64, offset int, limit int, hasLimit bool) (string, error) <span class="cov8" title="1">{
+        readOffset := int64(offset)
+        readSize := fileSize - readOffset
+        if hasLimit &amp;&amp; limit &gt; 0 &amp;&amp; int64(limit) &lt; readSize </span><span class="cov8" title="1">{
+                readSize = int64(limit)
+        }</span>
+        <span class="cov8" title="1">if readSize &lt;= 0 </span><span class="cov0" title="0">{
+                return "", nil
+        }</span>
+        <span class="cov8" title="1">buf := make([]byte, readSize)
+        n, readErr := f.ReadAt(buf, readOffset)
+        if readErr != nil &amp;&amp; readErr != io.EOF </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("read %s: %w", path, readErr)
+        }</span>
+        <span class="cov8" title="1">return string(buf[:n]), nil</span>
+}
+
+// readUTF16 reads a UTF-16 file with optional offset/limit range.
+func readUTF16(f *os.File, path string, fileSize int64, enc shared.TextEncoding, offset int, limit int, hasRange bool, hasLimit bool) (string, error) <span class="cov8" title="1">{
+        if hasRange </span><span class="cov0" title="0">{
+                if offset%2 != 0 </span><span class="cov0" title="0">{
+                        return "", fmt.Errorf("offset must be even for UTF-16 files")
+                }</span>
+                <span class="cov0" title="0">readOffset := int64(2 + offset)
+                readSize := fileSize - readOffset
+                if hasLimit &amp;&amp; limit &gt; 0 &amp;&amp; int64(limit) &lt; readSize </span><span class="cov0" title="0">{
+                        readSize = int64(limit)
+                }</span>
+                <span class="cov0" title="0">if readSize &lt;= 0 </span><span class="cov0" title="0">{
+                        return "", nil
+                }</span>
+                <span class="cov0" title="0">if readSize%2 != 0 </span><span class="cov0" title="0">{
+                        readSize--
+                }</span>
+                <span class="cov0" title="0">buf := make([]byte, readSize)
+                rn, readErr := f.ReadAt(buf, readOffset)
+                if readErr != nil &amp;&amp; readErr != io.EOF </span><span class="cov0" title="0">{
+                        return "", fmt.Errorf("read %s: %w", path, readErr)
+                }</span>
+                <span class="cov0" title="0">buf = buf[:rn]
+                if len(buf)%2 != 0 </span><span class="cov0" title="0">{
+                        buf = buf[:len(buf)-1]
+                }</span>
+                <span class="cov0" title="0">var bom []byte
+                if enc == shared.UTF16LE </span><span class="cov0" title="0">{
+                        bom = []byte{0xFF, 0xFE}
+                }</span> else<span class="cov0" title="0"> {
+                        bom = []byte{0xFE, 0xFF}
+                }</span>
+                <span class="cov0" title="0">return shared.DecodeUTF16(append(bom, buf...), enc)</span>
+        }
+        <span class="cov8" title="1">if fileSize &gt; int64(shared.MaxReadSize) </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("File is %d bytes (limit %d). Use offset/limit to read in parts.", fileSize, shared.MaxReadSize)
+        }</span>
+        <span class="cov8" title="1">allData := make([]byte, fileSize)
+        rn, readErr := f.ReadAt(allData, 0)
+        if readErr != nil &amp;&amp; readErr != io.EOF </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("read %s: %w", path, readErr)
+        }</span>
+        <span class="cov8" title="1">return shared.DecodeUTF16(allData[:rn], enc)</span>
+}
+
+// Write creates or overwrites a text file (§5.3).
+func Write(params map[string]interface{}, allowedRoots []string) (string, error) <span class="cov8" title="1">{
+        path, err := shared.RequireString(params, "path")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">if err := shared.CheckPathConfinement(path, allowedRoots); err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">content, err := shared.RequireString(params, "content")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">appendMode, _ := shared.OptionalBool(params, "append")
+        existing, existErr := shared.ReadFileWithRetry(path)
+        isCRLF := false
+        if existErr == nil &amp;&amp; len(existing) &gt; 0 </span><span class="cov8" title="1">{
+                scanLen := shared.CRLFScanSize
+                if len(existing) &lt; scanLen </span><span class="cov8" title="1">{
+                        scanLen = len(existing)
+                }</span>
+                <span class="cov8" title="1">isCRLF = bytes.Contains(existing[:scanLen], []byte("\r\n"))</span>
+        } else<span class="cov8" title="1"> if existErr != nil &amp;&amp; !shared.IsNotExist(existErr) </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("read %s: %w", path, existErr)
+        }</span>
+        <span class="cov8" title="1">if appendMode &amp;&amp; existErr == nil </span><span class="cov8" title="1">{
+                content = string(existing) + content
+        }</span>
+        <span class="cov8" title="1">output := []byte(content)
+        if isCRLF </span><span class="cov8" title="1">{
+                output = shared.NormaliseToCRLF(output)
+        }</span>
+        <span class="cov8" title="1">if err := shared.AtomicWrite(path, output); err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">return fmt.Sprintf("Wrote %d bytes to %s", len(output), path), nil</span>
+}
+
+// Copy copies a file or directory tree (§5.5).
+func Copy(params map[string]interface{}, allowedRoots []string) (string, error) <span class="cov8" title="1">{
+        source, err := shared.RequireString(params, "source")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">destination, err := shared.RequireString(params, "destination")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">if err := shared.CheckPathConfinement(source, allowedRoots); err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">if err := shared.CheckPathConfinement(destination, allowedRoots); err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">if _, err := os.Stat(destination); err == nil </span><span class="cov8" title="1">{
+                return "", fmt.Errorf("Destination already exists: %s", destination)
+        }</span>
+        <span class="cov8" title="1">recursive, _ := shared.OptionalBool(params, "recursive")
+        srcInfo, err := os.Stat(source)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("source not found: %s", source)
+        }</span>
+        <span class="cov8" title="1">if srcInfo.IsDir() </span><span class="cov8" title="1">{
+                if !recursive </span><span class="cov8" title="1">{
+                        return "", fmt.Errorf("source is a directory; use recursive=true to copy directory trees")
+                }</span>
+                <span class="cov8" title="1">return shared.CopyDir(source, destination)</span>
+        }
+        <span class="cov8" title="1">return shared.CopyFile(source, destination)</span>
+}
+
+// Move moves or renames a file or directory (§5.6).
+func Move(params map[string]interface{}, allowedRoots []string) (string, error) <span class="cov8" title="1">{
+        source, err := shared.RequireString(params, "source")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">destination, err := shared.RequireString(params, "destination")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">if err := shared.CheckPathConfinement(source, allowedRoots); err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">if err := shared.CheckPathConfinement(destination, allowedRoots); err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">if _, err := os.Stat(destination); err == nil </span><span class="cov8" title="1">{
+                return "", fmt.Errorf("Destination already exists: %s", destination)
+        }</span>
+        <span class="cov8" title="1">if err := os.Rename(source, destination); err != nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("move %s to %s: %w", source, destination, err)
+        }</span>
+        <span class="cov8" title="1">return fmt.Sprintf("Moved %s to %s", source, destination), nil</span>
+}
+
+// Delete deletes a file or empty directory (§5.7).
+func Delete(params map[string]interface{}, allowedRoots []string) (string, error) <span class="cov8" title="1">{
+        path, err := shared.RequireString(params, "path")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">if err := shared.CheckPathConfinement(path, allowedRoots); err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">if err := os.Remove(path); err != nil </span><span class="cov8" title="1">{
+                if strings.Contains(err.Error(), "directory is not empty") || strings.Contains(err.Error(), "The directory is not empty") </span><span class="cov8" title="1">{
+                        return "", fmt.Errorf("Directory is not empty: %s", path)
+                }</span>
+                <span class="cov0" title="0">return "", fmt.Errorf("delete %s: %w", path, err)</span>
+        }
+        <span class="cov8" title="1">return fmt.Sprintf("Deleted %s", path), nil</span>
+}
+
+// List lists directory contents with optional pattern filter (§5.8).
+func List(params map[string]interface{}, allowedRoots []string) (string, error) <span class="cov8" title="1">{
+        path, err := shared.RequireString(params, "path")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">if err := shared.CheckPathConfinement(path, allowedRoots); err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">pattern, _ := shared.OptionalString(params, "pattern")
+        entries, err := os.ReadDir(path)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("list %s: %w", path, err)
+        }</span>
+        <span class="cov8" title="1">var sb strings.Builder
+        for _, entry := range entries </span><span class="cov8" title="1">{
+                name := entry.Name()
+                if pattern != "" </span><span class="cov8" title="1">{
+                        matched, _ := filepath.Match(pattern, name)
+                        if !matched </span><span class="cov8" title="1">{
+                                continue</span>
+                        }
+                }
+                <span class="cov8" title="1">info, err := entry.Info()
+                if err != nil </span><span class="cov0" title="0">{
+                        continue</span>
+                }
+                <span class="cov8" title="1">kind := "file"
+                if entry.IsDir() </span><span class="cov8" title="1">{
+                        kind = "dir"
+                }</span>
+                <span class="cov8" title="1">fmt.Fprintf(&amp;sb, "%s\t%s\t%d\n", name, kind, info.Size())</span>
+        }
+        <span class="cov8" title="1">return sb.String(), nil</span>
+}
+
+// Search recursively searches for files matching a glob pattern (§5.9).
+func Search(params map[string]interface{}, allowedRoots []string) (string, error) <span class="cov8" title="1">{
+        path, err := shared.RequireString(params, "path")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">if err := shared.CheckPathConfinement(path, allowedRoots); err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">pattern, err := shared.RequireString(params, "pattern")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">maxResults, _ := shared.OptionalInt(params, "max_results")
+        if maxResults &lt;= 0 </span><span class="cov8" title="1">{
+                maxResults = shared.DefaultMaxResults
+        }</span>
+        <span class="cov8" title="1">var results []string
+        filepath.WalkDir(path, func(p string, d os.DirEntry, err error) error </span><span class="cov8" title="1">{
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil
+                }</span>
+                <span class="cov8" title="1">if len(results) &gt;= maxResults </span><span class="cov8" title="1">{
+                        return filepath.SkipAll
+                }</span>
+                <span class="cov8" title="1">matched, _ := filepath.Match(pattern, d.Name())
+                if matched </span><span class="cov8" title="1">{
+                        results = append(results, p)
+                }</span>
+                <span class="cov8" title="1">return nil</span>
+        })
+        <span class="cov8" title="1">return strings.Join(results, "\n"), nil</span>
+}
+
+// Info returns file or directory metadata (§5.10).
+func Info(params map[string]interface{}, allowedRoots []string) (string, error) <span class="cov8" title="1">{
+        path, err := shared.RequireString(params, "path")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">if err := shared.CheckPathConfinementFull(path, allowedRoots); err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">info, err := os.Stat(path)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("info %s: %w", path, err)
+        }</span>
+        <span class="cov8" title="1">kind := "file"
+        if info.IsDir() </span><span class="cov8" title="1">{
+                kind = "directory"
+        }</span>
+        <span class="cov8" title="1">readOnly := info.Mode().Perm()&amp;0200 == 0
+        created := shared.FileCreationTime(info)
+        return fmt.Sprintf("type: %s\nsize: %d\ncreated: %s\nmodified: %s\nread_only: %v",
+                kind, info.Size(), created, info.ModTime().Format(time.RFC3339), readOnly), nil</span>
+}
+
+// Cat reads and concatenates multiple files (§5.12).
+func Cat(params map[string]interface{}, allowedRoots []string) (string, error) <span class="cov8" title="1">{
+        pathsRaw, err := shared.RequireString(params, "paths")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">var paths []string
+        if strings.HasPrefix(strings.TrimSpace(pathsRaw), "[") </span><span class="cov0" title="0">{
+                if err := json.Unmarshal([]byte(pathsRaw), &amp;paths); err != nil </span><span class="cov0" title="0">{
+                        return "", fmt.Errorf("paths must be space-separated absolute paths or a JSON array of strings")
+                }</span>
+        } else<span class="cov8" title="1"> {
+                paths = splitPaths(pathsRaw)
+        }</span>
+        <span class="cov8" title="1">if len(paths) == 0 </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("no paths provided")
+        }</span>
+        <span class="cov8" title="1">var sb strings.Builder
+        for i, p := range paths </span><span class="cov8" title="1">{
+                p = strings.TrimSpace(p)
+                if p == "" </span><span class="cov0" title="0">{
+                        continue</span>
+                }
+                <span class="cov8" title="1">if err := shared.CheckPathConfinementFull(p, allowedRoots); err != nil </span><span class="cov0" title="0">{
+                        return "", err
+                }</span>
+                <span class="cov8" title="1">data, err := shared.ReadFileWithRetry(p)
+                if err != nil </span><span class="cov8" title="1">{
+                        return "", fmt.Errorf("cat %s: %w", p, err)
+                }</span>
+                <span class="cov8" title="1">enc, encErr := shared.DetectTextEncoding(data)
+                if encErr != nil </span><span class="cov0" title="0">{
+                        return "", fmt.Errorf("%s: %w", p, encErr)
+                }</span>
+                <span class="cov8" title="1">if i &gt; 0 </span><span class="cov8" title="1">{
+                        sb.WriteString("\n")
+                }</span>
+                <span class="cov8" title="1">if enc == shared.UTF16LE || enc == shared.UTF16BE </span><span class="cov0" title="0">{
+                        decoded, err := shared.DecodeUTF16(data, enc)
+                        if err != nil </span><span class="cov0" title="0">{
+                                return "", fmt.Errorf("%s: %w", p, err)
+                        }</span>
+                        <span class="cov0" title="0">sb.WriteString(decoded)</span>
+                } else<span class="cov8" title="1"> {
+                        sb.Write(data)
+                }</span>
+                <span class="cov8" title="1">if sb.Len() &gt; shared.MaxReadSize </span><span class="cov8" title="1">{
+                        return "", fmt.Errorf("combined output exceeds %d bytes", shared.MaxReadSize)
+                }</span>
+        }
+        <span class="cov8" title="1">return sb.String(), nil</span>
+}
+
+// splitPaths splits a space-separated path string, respecting double quotes.
+func splitPaths(s string) []string <span class="cov8" title="1">{
+        var paths []string
+        var current strings.Builder
+        inQuote := false
+        for i := 0; i &lt; len(s); i++ </span><span class="cov8" title="1">{
+                c := s[i]
+                if c == '"' </span><span class="cov0" title="0">{
+                        inQuote = !inQuote
+                }</span> else<span class="cov8" title="1"> if (c == ' ' || c == '\t') &amp;&amp; !inQuote </span><span class="cov8" title="1">{
+                        if current.Len() &gt; 0 </span><span class="cov8" title="1">{
+                                paths = append(paths, current.String())
+                                current.Reset()
+                        }</span>
+                } else<span class="cov8" title="1"> {
+                        current.WriteByte(c)
+                }</span>
+        }
+        <span class="cov8" title="1">if current.Len() &gt; 0 </span><span class="cov8" title="1">{
+                paths = append(paths, current.String())
+        }</span>
+        <span class="cov8" title="1">return paths</span>
+}
+
+// Diff computes a unified diff between two text files (§5.16).
+func Diff(params map[string]interface{}, allowedRoots []string) (string, error) <span class="cov8" title="1">{
+        file1, err := shared.RequireString(params, "file1")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">file2, err := shared.RequireString(params, "file2")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">if err := shared.CheckPathConfinementFull(file1, allowedRoots); err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">if err := shared.CheckPathConfinementFull(file2, allowedRoots); err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">contextLines, hasCtx := shared.OptionalInt(params, "context_lines")
+        if !hasCtx || contextLines &lt; 0 </span><span class="cov8" title="1">{
+                contextLines = 3
+        }</span>
+        <span class="cov8" title="1">data1, err := shared.ReadFileWithRetry(file1)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">text1, err := decodeForDiff(data1, file1)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">data2, err := shared.ReadFileWithRetry(file2)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">text2, err := decodeForDiff(data2, file2)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">lines1 := strings.Split(text1, "\n")
+        lines2 := strings.Split(text2, "\n")
+        return unifiedDiff(file1, file2, lines1, lines2, contextLines), nil</span>
+}
+
+// decodeForDiff detects encoding and decodes file data for diffing.
+func decodeForDiff(data []byte, name string) (string, error) <span class="cov8" title="1">{
+        enc, err := shared.DetectTextEncoding(data)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("%s: %w", name, err)
+        }</span>
+        <span class="cov8" title="1">if enc == shared.UTF16LE || enc == shared.UTF16BE </span><span class="cov0" title="0">{
+                decoded, err := shared.DecodeUTF16(data, enc)
+                if err != nil </span><span class="cov0" title="0">{
+                        return "", fmt.Errorf("%s: %w", name, err)
+                }</span>
+                <span class="cov0" title="0">return decoded, nil</span>
+        }
+        <span class="cov8" title="1">return string(data), nil</span>
+}
+
+// unifiedDiff produces a unified diff between two slices of lines.
+func unifiedDiff(name1, name2 string, a, b []string, contextLines int) string <span class="cov8" title="1">{
+        // Simple LCS-based diff
+        m, n := len(a), len(b)
+        // Build edit script using Myers-like approach (simple O(mn) DP)
+        // dp[i][j] = LCS length of a[:i] and b[:j]
+        dp := make([][]int, m+1)
+        for i := range dp </span><span class="cov8" title="1">{
+                dp[i] = make([]int, n+1)
+        }</span>
+        <span class="cov8" title="1">for i := 1; i &lt;= m; i++ </span><span class="cov8" title="1">{
+                for j := 1; j &lt;= n; j++ </span><span class="cov8" title="1">{
+                        if a[i-1] == b[j-1] </span><span class="cov8" title="1">{
+                                dp[i][j] = dp[i-1][j-1] + 1
+                        }</span> else<span class="cov8" title="1"> if dp[i-1][j] &gt;= dp[i][j-1] </span><span class="cov8" title="1">{
+                                dp[i][j] = dp[i-1][j]
+                        }</span> else<span class="cov8" title="1"> {
+                                dp[i][j] = dp[i][j-1]
+                        }</span>
+                }
+        }
+        // Backtrack to get edit operations
+        <span class="cov8" title="1">type editOp struct {
+                op   byte // ' ' = context, '-' = delete from a, '+' = insert from b
+                line string
+                aIdx int // 1-based index in a (-1 if insert)
+                bIdx int // 1-based index in b (-1 if delete)
+        }
+        var ops []editOp
+        i, j := m, n
+        for i &gt; 0 || j &gt; 0 </span><span class="cov8" title="1">{
+                if i &gt; 0 &amp;&amp; j &gt; 0 &amp;&amp; a[i-1] == b[j-1] </span><span class="cov8" title="1">{
+                        ops = append(ops, editOp{' ', a[i-1], i, j})
+                        i--
+                        j--
+                }</span> else<span class="cov8" title="1"> if j &gt; 0 &amp;&amp; (i == 0 || dp[i][j-1] &gt;= dp[i-1][j]) </span><span class="cov8" title="1">{
+                        ops = append(ops, editOp{'+', b[j-1], -1, j})
+                        j--
+                }</span> else<span class="cov8" title="1"> {
+                        ops = append(ops, editOp{'-', a[i-1], i, -1})
+                        i--
+                }</span>
+        }
+        // Reverse ops (built in reverse order)
+        <span class="cov8" title="1">for left, right := 0, len(ops)-1; left &lt; right; left, right = left+1, right-1 </span><span class="cov8" title="1">{
+                ops[left], ops[right] = ops[right], ops[left]
+        }</span>
+        // Check if files are identical
+        <span class="cov8" title="1">allContext := true
+        for _, op := range ops </span><span class="cov8" title="1">{
+                if op.op != ' ' </span><span class="cov8" title="1">{
+                        allContext = false
+                        break</span>
+                }
+        }
+        <span class="cov8" title="1">if allContext </span><span class="cov8" title="1">{
+                return ""
+        }</span>
+        // Group into hunks with context
+        <span class="cov8" title="1">var sb strings.Builder
+        fmt.Fprintf(&amp;sb, "--- %s\n", name1)
+        fmt.Fprintf(&amp;sb, "+++ %s\n", name2)
+        // Find change regions and expand with context
+        type hunkRange struct{ start, end int }
+        var changes []hunkRange
+        for idx, op := range ops </span><span class="cov8" title="1">{
+                if op.op != ' ' </span><span class="cov8" title="1">{
+                        if len(changes) &gt; 0 &amp;&amp; idx-changes[len(changes)-1].end &lt;= 2*contextLines </span><span class="cov8" title="1">{
+                                changes[len(changes)-1].end = idx
+                        }</span> else<span class="cov8" title="1"> {
+                                changes = append(changes, hunkRange{idx, idx})
+                        }</span>
+                }
+        }
+        <span class="cov8" title="1">for _, ch := range changes </span><span class="cov8" title="1">{
+                start := ch.start - contextLines
+                if start &lt; 0 </span><span class="cov8" title="1">{
+                        start = 0
+                }</span>
+                <span class="cov8" title="1">end := ch.end + contextLines + 1
+                if end &gt; len(ops) </span><span class="cov8" title="1">{
+                        end = len(ops)
+                }</span>
+                // Compute line ranges for the hunk header
+                <span class="cov8" title="1">aStart, aCount := 0, 0
+                bStart, bCount := 0, 0
+                for k := start; k &lt; end; k++ </span><span class="cov8" title="1">{
+                        op := ops[k]
+                        if op.op == ' ' || op.op == '-' </span><span class="cov8" title="1">{
+                                if aStart == 0 </span><span class="cov8" title="1">{
+                                        aStart = op.aIdx
+                                }</span>
+                                <span class="cov8" title="1">aCount++</span>
+                        }
+                        <span class="cov8" title="1">if op.op == ' ' || op.op == '+' </span><span class="cov8" title="1">{
+                                if bStart == 0 </span><span class="cov8" title="1">{
+                                        bStart = op.bIdx
+                                }</span>
+                                <span class="cov8" title="1">bCount++</span>
+                        }
+                }
+                <span class="cov8" title="1">if aStart == 0 </span><span class="cov0" title="0">{
+                        aStart = 1
+                }</span>
+                <span class="cov8" title="1">if bStart == 0 </span><span class="cov0" title="0">{
+                        bStart = 1
+                }</span>
+                <span class="cov8" title="1">fmt.Fprintf(&amp;sb, "@@ -%d,%d +%d,%d @@\n", aStart, aCount, bStart, bCount)
+                for k := start; k &lt; end; k++ </span><span class="cov8" title="1">{
+                        op := ops[k]
+                        fmt.Fprintf(&amp;sb, "%c%s\n", op.op, op.line)
+                }</span>
+        }
+        <span class="cov8" title="1">return strings.TrimRight(sb.String(), "\n")</span>
+}
+
+// Head returns the first N lines of a text file (§5.14).
+func Head(params map[string]interface{}, allowedRoots []string) (string, error) <span class="cov8" title="1">{
+        path, err := shared.RequireString(params, "path")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">if err := shared.CheckPathConfinementFull(path, allowedRoots); err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">n, hasN := shared.OptionalInt(params, "lines")
+        if !hasN || n &lt;= 0 </span><span class="cov8" title="1">{
+                n = 10
+        }</span>
+        <span class="cov8" title="1">f, err := shared.OpenFileWithRetry(path)
+        if err != nil </span><span class="cov8" title="1">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">defer f.Close()
+        // Read header for encoding detection
+        header := make([]byte, shared.BinaryScanSize)
+        headerN, _ := f.Read(header)
+        header = header[:headerN]
+        enc, encErr := shared.DetectTextEncoding(header)
+        if encErr != nil </span><span class="cov0" title="0">{
+                return "", encErr
+        }</span>
+        <span class="cov8" title="1">if enc == shared.UTF16LE || enc == shared.UTF16BE </span><span class="cov0" title="0">{
+                // Cannot use bufio.Scanner on UTF-16; read entire file, decode, split.
+                f.Seek(0, io.SeekStart)
+                data, err := io.ReadAll(io.LimitReader(f, int64(shared.MaxReadSize)))
+                if err != nil </span><span class="cov0" title="0">{
+                        return "", fmt.Errorf("read %s: %w", path, err)
+                }</span>
+                <span class="cov0" title="0">decoded, err := shared.DecodeUTF16(data, enc)
+                if err != nil </span><span class="cov0" title="0">{
+                        return "", err
+                }</span>
+                <span class="cov0" title="0">lines := strings.Split(decoded, "\n")
+                // Trim \r from CRLF
+                for i := range lines </span><span class="cov0" title="0">{
+                        lines[i] = strings.TrimRight(lines[i], "\r")
+                }</span>
+                <span class="cov0" title="0">if len(lines) &gt; n </span><span class="cov0" title="0">{
+                        lines = lines[:n]
+                }</span>
+                <span class="cov0" title="0">return strings.Join(lines, "\n"), nil</span>
+        }
+        // UTF-8 path
+        <span class="cov8" title="1">f.Seek(0, io.SeekStart)
+        scanner := bufio.NewScanner(f)
+        var lines []string
+        for scanner.Scan() &amp;&amp; len(lines) &lt; n </span><span class="cov8" title="1">{
+                lines = append(lines, scanner.Text())
+        }</span>
+        <span class="cov8" title="1">return strings.Join(lines, "\n"), nil</span>
+}
+
+// Mkdir creates a directory and any missing parents (§5.13).
+func Mkdir(params map[string]interface{}, allowedRoots []string) (string, error) <span class="cov8" title="1">{
+        path, err := shared.RequireString(params, "path")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">if err := shared.CheckPathConfinement(path, allowedRoots); err != nil </span><span class="cov8" title="1">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">if err := os.MkdirAll(path, 0755); err != nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("mkdir %s: %w", path, err)
+        }</span>
+        <span class="cov8" title="1">return fmt.Sprintf("Created %s", path), nil</span>
+}
+
+// Roots returns the allowed_roots from config (§5.19).
+func Roots(cfg *shared.Config) (string, error) <span class="cov8" title="1">{
+        if len(cfg.Security.AllowedRoots) == 0 </span><span class="cov0" title="0">{
+                return "(no allowed roots configured)", nil
+        }</span>
+        <span class="cov8" title="1">return strings.Join(cfg.Security.AllowedRoots, "\n"), nil</span>
+}
+
+// Tail returns the last N lines of a text file (§5.15).
+func Tail(params map[string]interface{}, allowedRoots []string) (string, error) <span class="cov8" title="1">{
+        path, err := shared.RequireString(params, "path")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">if err := shared.CheckPathConfinementFull(path, allowedRoots); err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">n, hasN := shared.OptionalInt(params, "lines")
+        if !hasN || n &lt;= 0 </span><span class="cov8" title="1">{
+                n = 10
+        }</span>
+        <span class="cov8" title="1">info, err := shared.StatWithRetry(path)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">f, err := shared.OpenFileWithRetry(path)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">defer f.Close()
+        fileSize := info.Size()
+        headerBuf := make([]byte, shared.BinaryScanSize)
+        if int64(shared.BinaryScanSize) &gt; fileSize </span><span class="cov8" title="1">{
+                headerBuf = make([]byte, fileSize)
+        }</span>
+        <span class="cov8" title="1">headerN, _ := f.ReadAt(headerBuf, 0)
+        headerBuf = headerBuf[:headerN]
+        enc, encErr := shared.DetectTextEncoding(headerBuf)
+        if encErr != nil </span><span class="cov8" title="1">{
+                return "", encErr
+        }</span>
+        <span class="cov8" title="1">if enc == shared.UTF16LE || enc == shared.UTF16BE </span><span class="cov0" title="0">{
+                return tailUTF16(f, path, fileSize, enc, n)
+        }</span>
+        <span class="cov8" title="1">if fileSize &lt;= int64(shared.MaxReadSize) </span><span class="cov8" title="1">{
+                data, err := io.ReadAll(f)
+                if err != nil </span><span class="cov0" title="0">{
+                        return "", fmt.Errorf("read %s: %w", path, err)
+                }</span>
+                <span class="cov8" title="1">if err := shared.CheckTextFile(data); err != nil </span><span class="cov0" title="0">{
+                        return "", err
+                }</span>
+                <span class="cov8" title="1">return tailSmall(data, n), nil</span>
+        }
+        <span class="cov8" title="1">return tailSeek(f, path, fileSize, n)</span>
+}
+
+// tailSmall returns the last n lines from in-memory file content.
+func tailSmall(content []byte, n int) string <span class="cov8" title="1">{
+        lines := strings.Split(string(content), "\n")
+        if len(lines) &gt; 0 &amp;&amp; lines[len(lines)-1] == "" </span><span class="cov0" title="0">{
+                lines = lines[:len(lines)-1]
+        }</span>
+        <span class="cov8" title="1">if len(lines) &lt;= n </span><span class="cov0" title="0">{
+                return strings.Join(lines, "\n")
+        }</span>
+        <span class="cov8" title="1">return strings.Join(lines[len(lines)-n:], "\n")</span>
+}
+
+// tailSeek returns the last n lines from a large file using seek-based reading.
+func tailSeek(f *os.File, path string, fileSize int64, n int) (string, error) <span class="cov8" title="1">{
+        chunkSize := int64(64 * 1024)
+        offset := fileSize - chunkSize
+        if offset &lt; 0 </span><span class="cov0" title="0">{
+                offset = 0
+        }</span>
+        <span class="cov8" title="1">f.Seek(offset, io.SeekStart)
+        data, err := io.ReadAll(f)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("read tail %s: %w", path, err)
+        }</span>
+        <span class="cov8" title="1">if err := shared.CheckTextFile(data); err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">lines := strings.Split(string(data), "\n")
+        if len(lines) &gt; 0 &amp;&amp; lines[len(lines)-1] == "" </span><span class="cov8" title="1">{
+                lines = lines[:len(lines)-1]
+        }</span>
+        <span class="cov8" title="1">if offset &gt; 0 &amp;&amp; len(lines) &gt; 0 </span><span class="cov8" title="1">{
+                lines = lines[1:]
+        }</span>
+        <span class="cov8" title="1">if len(lines) &lt;= n </span><span class="cov0" title="0">{
+                return strings.Join(lines, "\n"), nil
+        }</span>
+        <span class="cov8" title="1">return strings.Join(lines[len(lines)-n:], "\n"), nil</span>
+}
+
+// tailUTF16 returns the last n lines from a UTF-16 encoded file.
+func tailUTF16(f *os.File, path string, fileSize int64, enc shared.TextEncoding, n int) (string, error) <span class="cov0" title="0">{
+        if fileSize &lt;= int64(shared.MaxReadSize) </span><span class="cov0" title="0">{
+                f.Seek(0, io.SeekStart)
+                data, err := io.ReadAll(f)
+                if err != nil </span><span class="cov0" title="0">{
+                        return "", fmt.Errorf("read %s: %w", path, err)
+                }</span>
+                <span class="cov0" title="0">decoded, err := shared.DecodeUTF16(data, enc)
+                if err != nil </span><span class="cov0" title="0">{
+                        return "", err
+                }</span>
+                <span class="cov0" title="0">return tailFromDecoded(decoded, n, false), nil</span>
+        }
+        <span class="cov0" title="0">chunkSize := int64(64 * 1024)
+        offset := fileSize - chunkSize
+        if offset &lt; 2 </span><span class="cov0" title="0">{
+                offset = 0
+        }</span> else<span class="cov0" title="0"> if offset%2 != 0 </span><span class="cov0" title="0">{
+                offset--
+        }</span>
+        <span class="cov0" title="0">f.Seek(offset, io.SeekStart)
+        data, err := io.ReadAll(f)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("read tail %s: %w", path, err)
+        }</span>
+        <span class="cov0" title="0">if len(data)%2 != 0 </span><span class="cov0" title="0">{
+                data = data[:len(data)-1]
+        }</span>
+        <span class="cov0" title="0">if offset == 0 </span><span class="cov0" title="0">{
+                decoded, err := shared.DecodeUTF16(data, enc)
+                if err != nil </span><span class="cov0" title="0">{
+                        return "", err
+                }</span>
+                <span class="cov0" title="0">return tailFromDecoded(decoded, n, false), nil</span>
+        }
+        <span class="cov0" title="0">var bom []byte
+        if enc == shared.UTF16LE </span><span class="cov0" title="0">{
+                bom = []byte{0xFF, 0xFE}
+        }</span> else<span class="cov0" title="0"> {
+                bom = []byte{0xFE, 0xFF}
+        }</span>
+        <span class="cov0" title="0">decoded, err := shared.DecodeUTF16(append(bom, data...), enc)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov0" title="0">return tailFromDecoded(decoded, n, true), nil</span>
+}
+
+// tailFromDecoded extracts the last n lines from decoded UTF-16 text.
+func tailFromDecoded(decoded string, n int, dropFirst bool) string <span class="cov0" title="0">{
+        lines := strings.Split(decoded, "\n")
+        for i := range lines </span><span class="cov0" title="0">{
+                lines[i] = strings.TrimRight(lines[i], "\r")
+        }</span>
+        <span class="cov0" title="0">if len(lines) &gt; 0 &amp;&amp; lines[len(lines)-1] == "" </span><span class="cov0" title="0">{
+                lines = lines[:len(lines)-1]
+        }</span>
+        <span class="cov0" title="0">if dropFirst &amp;&amp; len(lines) &gt; 0 </span><span class="cov0" title="0">{
+                lines = lines[1:]
+        }</span>
+        <span class="cov0" title="0">if len(lines) &lt;= n </span><span class="cov0" title="0">{
+                return strings.Join(lines, "\n")
+        }</span>
+        <span class="cov0" title="0">return strings.Join(lines[len(lines)-n:], "\n")</span>
+}
+
+// Tree produces a recursive indented directory listing (§5.18).
+func Tree(params map[string]interface{}, allowedRoots []string) (string, error) <span class="cov8" title="1">{
+        path, err := shared.RequireString(params, "path")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">if err := shared.CheckPathConfinement(path, allowedRoots); err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">maxDepth, hasDepth := shared.OptionalInt(params, "depth")
+        if !hasDepth || maxDepth &lt;= 0 </span><span class="cov8" title="1">{
+                maxDepth = 3
+        }</span>
+        <span class="cov8" title="1">pattern, _ := shared.OptionalString(params, "pattern")
+        var sb strings.Builder
+        count := 0
+        maxEntries := 500
+        basePath := filepath.Clean(path)
+        filepath.WalkDir(basePath, func(p string, d os.DirEntry, err error) error </span><span class="cov8" title="1">{
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil
+                }</span>
+                <span class="cov8" title="1">if count &gt;= maxEntries </span><span class="cov0" title="0">{
+                        return filepath.SkipAll
+                }</span>
+                <span class="cov8" title="1">rel, _ := filepath.Rel(basePath, p)
+                if rel == "." </span><span class="cov8" title="1">{
+                        return nil
+                }</span>
+                <span class="cov8" title="1">depth := strings.Count(rel, string(filepath.Separator)) + 1
+                if depth &gt; maxDepth </span><span class="cov8" title="1">{
+                        if d.IsDir() </span><span class="cov8" title="1">{
+                                return filepath.SkipDir
+                        }</span>
+                        <span class="cov0" title="0">return nil</span>
+                }
+                <span class="cov8" title="1">if pattern != "" &amp;&amp; !d.IsDir() </span><span class="cov8" title="1">{
+                        matched, _ := filepath.Match(pattern, d.Name())
+                        if !matched </span><span class="cov8" title="1">{
+                                return nil
+                        }</span>
+                }
+                <span class="cov8" title="1">indent := strings.Repeat("  ", depth-1)
+                name := d.Name()
+                if d.IsDir() </span><span class="cov8" title="1">{
+                        name += "/"
+                }</span>
+                <span class="cov8" title="1">fmt.Fprintf(&amp;sb, "%s%s\n", indent, name)
+                count++
+                return nil</span>
+        })
+        <span class="cov8" title="1">return strings.TrimRight(sb.String(), "\n"), nil</span>
+}
+
+// Wc counts lines, words, and bytes in a text file (§5.17).
+func Wc(params map[string]interface{}, allowedRoots []string) (string, error) <span class="cov8" title="1">{
+        path, err := shared.RequireString(params, "path")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">if err := shared.CheckPathConfinementFull(path, allowedRoots); err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">f, err := shared.OpenFileWithRetry(path)
+        if err != nil </span><span class="cov8" title="1">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">defer f.Close()
+        // Read header for encoding detection
+        header := make([]byte, shared.BinaryScanSize)
+        headerN, _ := f.Read(header)
+        header = header[:headerN]
+        enc, encErr := shared.DetectTextEncoding(header)
+        if encErr != nil </span><span class="cov0" title="0">{
+                return "", encErr
+        }</span>
+        <span class="cov8" title="1">if enc == shared.UTF16LE || enc == shared.UTF16BE </span><span class="cov0" title="0">{
+                // Read entire file, decode to UTF-8, count on decoded string.
+                f.Seek(0, io.SeekStart)
+                data, err := io.ReadAll(io.LimitReader(f, int64(shared.MaxReadSize)))
+                if err != nil </span><span class="cov0" title="0">{
+                        return "", fmt.Errorf("read %s: %w", path, err)
+                }</span>
+                <span class="cov0" title="0">decoded, err := shared.DecodeUTF16(data, enc)
+                if err != nil </span><span class="cov0" title="0">{
+                        return "", err
+                }</span>
+                <span class="cov0" title="0">lines := strings.Split(decoded, "\n")
+                // Trim \r from CRLF
+                for i := range lines </span><span class="cov0" title="0">{
+                        lines[i] = strings.TrimRight(lines[i], "\r")
+                }</span>
+                <span class="cov0" title="0">lineCount := len(lines)
+                if lineCount &gt; 0 &amp;&amp; lines[lineCount-1] == "" </span><span class="cov0" title="0">{
+                        lineCount--
+                }</span>
+                <span class="cov0" title="0">wordCount := 0
+                for _, line := range lines </span><span class="cov0" title="0">{
+                        words := strings.FieldsFunc(line, unicode.IsSpace)
+                        wordCount += len(words)
+                }</span>
+                <span class="cov0" title="0">byteCount := len(decoded)
+                return fmt.Sprintf("lines: %d\nwords: %d\nbytes: %d", lineCount, wordCount, byteCount), nil</span>
+        }
+        // UTF-8 path
+        <span class="cov8" title="1">f.Seek(0, io.SeekStart)
+        var lineCount, wordCount int
+        var byteCount int64
+        scanner := bufio.NewScanner(f)
+        for scanner.Scan() </span><span class="cov8" title="1">{
+                line := scanner.Text()
+                lineCount++
+                byteCount += int64(len(scanner.Bytes())) + 1 // +1 for newline
+                words := strings.FieldsFunc(line, unicode.IsSpace)
+                wordCount += len(words)
+        }</span>
+        <span class="cov8" title="1">if err := scanner.Err(); err != nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("read %s: %w", path, err)
+        }</span>
+        <span class="cov8" title="1">return fmt.Sprintf("lines: %d\nwords: %d\nbytes: %d", lineCount, wordCount, byteCount), nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package tools
+
+import (
+        "bytes"
+        "encoding/json"
+        "fmt"
+        "os"
+        "os/exec"
+        "path/filepath"
+
+        "github.com/MauriceCalvert/WinMcpShim/shared"
+)
+
+// Edit delegates to strpatch.exe for find-and-replace (§5.4).
+func Edit(params map[string]interface{}, allowedRoots []string) (string, error) <span class="cov8" title="1">{
+        path, err := shared.RequireString(params, "path")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">if err := shared.CheckPathConfinement(path, allowedRoots); err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">oldText, err := shared.RequireString(params, "old_text")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">newText, err := shared.RequireString(params, "new_text")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">strpatchPath := FindStrpatch()
+        if strpatchPath == "" </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("strpatch.exe not found adjacent to shim executable")
+        }</span>
+        <span class="cov8" title="1">input := map[string]string{
+                "path":     path,
+                "old_text": oldText,
+                "new_text": newText,
+        }
+        jsonData, err := json.Marshal(input)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("marshal edit request: %w", err)
+        }</span>
+        <span class="cov8" title="1">cmd := exec.Command(strpatchPath)
+        cmd.Stdin = bytes.NewReader(jsonData)
+        var stdout, stderr bytes.Buffer
+        cmd.Stdout = &amp;stdout
+        cmd.Stderr = &amp;stderr
+        err = cmd.Run()
+        if err != nil </span><span class="cov8" title="1">{
+                if stderr.Len() &gt; 0 </span><span class="cov8" title="1">{
+                        return "", fmt.Errorf("%s", stderr.String())
+                }</span>
+                <span class="cov0" title="0">return "", fmt.Errorf("edit %s: %w", path, err)</span>
+        }
+        <span class="cov8" title="1">return stdout.String(), nil</span>
+}
+
+// FindStrpatch locates strpatch.exe adjacent to the shim executable.
+func FindStrpatch() string <span class="cov8" title="1">{
+        exe, err := os.Executable()
+        if err != nil </span><span class="cov0" title="0">{
+                return ""
+        }</span>
+        <span class="cov8" title="1">dir := filepath.Dir(exe)
+        candidate := filepath.Join(dir, "strpatch.exe")
+        if _, err := os.Stat(candidate); err == nil </span><span class="cov8" title="1">{
+                return candidate
+        }</span>
+        <span class="cov0" title="0">candidate = filepath.Join(dir, "strpatch", "strpatch.exe")
+        if _, err := os.Stat(candidate); err == nil </span><span class="cov0" title="0">{
+                return candidate
+        }</span>
+        <span class="cov0" title="0">return ""</span>
+}
+</pre>
+		
+		<pre class="file" id="file14" style="display: none">package tools
+
+import (
+        "encoding/json"
+        "fmt"
+        "os"
+        "sort"
+
+        "github.com/MauriceCalvert/WinMcpShim/shared"
+)
+
+// BuildResult holds the schemas and any startup warnings from BuildToolSchemas.
+type BuildResult struct {
+        Schemas        []shared.ToolSchema
+        Warnings       []string
+        BuiltinOverrides map[string]bool
+}
+
+// BuildToolSchemas generates tool schemas for all built-in and configured tools.
+// Returns schemas, startup warnings, and a set of tool names using builtin overrides.
+func BuildToolSchemas(cfg *shared.Config) (*BuildResult, error) <span class="cov8" title="1">{
+        schemas, err := BuiltinSchemas(cfg.BuiltinDescriptions, cfg.Run.InactivityTimeout, cfg.Security.MaxTimeout)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">result := &amp;BuildResult{
+                Schemas:          schemas,
+                BuiltinOverrides: make(map[string]bool),
+        }
+        for name, toolCfg := range cfg.Tools </span><span class="cov8" title="1">{
+                if name == "grep" </span><span class="cov8" title="1">{
+                        if _, statErr := os.Stat(toolCfg.Exe); statErr != nil </span><span class="cov0" title="0">{
+                                // Exe missing — register builtin fallback
+                                desc := "Search inside file contents by regex. Uses Go RE2 regex syntax (not GNU grep BRE): unescaped (, ), +, ? are metacharacters. No backreferences. Set recursive=true + include to search a directory tree."
+                                result.Schemas = append(result.Schemas, BuiltinGrepSchema(desc))
+                                result.Warnings = append(result.Warnings,
+                                        fmt.Sprintf("grep: configured exe not found at %s, using built-in fallback", toolCfg.Exe))
+                                result.BuiltinOverrides["grep"] = true
+                                continue</span>
+                        }
+                }
+                <span class="cov8" title="1">result.Schemas = append(result.Schemas, ExternalToolSchema(name, toolCfg, cfg.Security.MaxTimeout))</span>
+        }
+        // If grep not configured at all, register builtin unconditionally
+        <span class="cov8" title="1">if _, hasGrep := cfg.Tools["grep"]; !hasGrep </span><span class="cov8" title="1">{
+                desc, ok := cfg.BuiltinDescriptions["grep"]
+                if !ok </span><span class="cov0" title="0">{
+                        desc = "Search inside file contents by regex. Uses Go RE2 regex syntax (not GNU grep BRE): unescaped (, ), +, ? are metacharacters. No backreferences. Set recursive=true + include to search a directory tree."
+                }</span>
+                <span class="cov8" title="1">result.Schemas = append(result.Schemas, BuiltinGrepSchema(desc))
+                result.BuiltinOverrides["grep"] = true</span>
+        }
+        <span class="cov8" title="1">return result, nil</span>
+}
+
+// BuiltinSchemas returns the MCP schemas for all built-in tools (§11.2).
+func BuiltinSchemas(descriptions map[string]string, runDefaultTimeout int, maxTimeout int) ([]shared.ToolSchema, error) <span class="cov8" title="1">{
+        type entry struct {
+                name        string
+                schema      string
+                annotations *shared.ToolAnnotations
+        }
+        entries := []entry{
+                {"read", `{
+                        "type": "object",
+                        "properties": {
+                                "path": {"type": "string", "description": "Absolute file path"},
+                                "offset": {"type": "integer", "description": "Byte offset to start reading (for large files or partial reads)"},
+                                "limit": {"type": "integer", "description": "Maximum bytes to return (for large files or partial reads)"}
+                        },
+                        "required": ["path"]
+                }`, &amp;shared.ToolAnnotations{
+                        Title:           "Read File",
+                        ReadOnlyHint:    true,
+                        DestructiveHint: false,
+                        IdempotentHint:  true,
+                        OpenWorldHint:   false,
+                }},
+                {"write", `{
+                        "type": "object",
+                        "properties": {
+                                "path": {"type": "string", "description": "Absolute file path"},
+                                "content": {"type": "string", "description": "Text content to write"},
+                                "append": {"type": "boolean", "description": "Append to existing file instead of overwriting"}
+                        },
+                        "required": ["path", "content"]
+                }`, &amp;shared.ToolAnnotations{
+                        Title:           "Write File",
+                        ReadOnlyHint:    false,
+                        DestructiveHint: true,
+                        IdempotentHint:  true,
+                        OpenWorldHint:   false,
+                }},
+                {"edit", `{
+                        "type": "object",
+                        "properties": {
+                                "path": {"type": "string", "description": "Absolute file path"},
+                                "old_text": {"type": "string", "description": "Exact text to find (must appear exactly once in the file)"},
+                                "new_text": {"type": "string", "description": "Replacement text (empty string to delete)"}
+                        },
+                        "required": ["path", "old_text", "new_text"]
+                }`, &amp;shared.ToolAnnotations{
+                        Title:           "Edit File",
+                        ReadOnlyHint:    false,
+                        DestructiveHint: true,
+                        IdempotentHint:  false,
+                        OpenWorldHint:   false,
+                }},
+                {"copy", `{
+                        "type": "object",
+                        "properties": {
+                                "source": {"type": "string", "description": "Absolute source path"},
+                                "destination": {"type": "string", "description": "Absolute destination path (must not already exist)"},
+                                "recursive": {"type": "boolean", "description": "Required for directories; copies the entire tree"}
+                        },
+                        "required": ["source", "destination"]
+                }`, &amp;shared.ToolAnnotations{
+                        Title:           "Copy File or Directory",
+                        ReadOnlyHint:    false,
+                        DestructiveHint: false,
+                        IdempotentHint:  false,
+                        OpenWorldHint:   false,
+                }},
+                {"move", `{
+                        "type": "object",
+                        "properties": {
+                                "source": {"type": "string", "description": "Absolute source path"},
+                                "destination": {"type": "string", "description": "Absolute destination path (must not already exist)"}
+                        },
+                        "required": ["source", "destination"]
+                }`, &amp;shared.ToolAnnotations{
+                        Title:           "Move or Rename",
+                        ReadOnlyHint:    false,
+                        DestructiveHint: true,
+                        IdempotentHint:  false,
+                        OpenWorldHint:   false,
+                }},
+                {"delete", `{
+                        "type": "object",
+                        "properties": {
+                                "path": {"type": "string", "description": "Absolute path to delete"}
+                        },
+                        "required": ["path"]
+                }`, &amp;shared.ToolAnnotations{
+                        Title:           "Delete File or Empty Directory",
+                        ReadOnlyHint:    false,
+                        DestructiveHint: true,
+                        IdempotentHint:  false,
+                        OpenWorldHint:   false,
+                }},
+                {"list", `{
+                        "type": "object",
+                        "properties": {
+                                "path": {"type": "string", "description": "Absolute directory path"},
+                                "pattern": {"type": "string", "description": "Glob pattern to filter entries (e.g. *.py)"}
+                        },
+                        "required": ["path"]
+                }`, &amp;shared.ToolAnnotations{
+                        Title:           "List Directory",
+                        ReadOnlyHint:    true,
+                        DestructiveHint: false,
+                        IdempotentHint:  true,
+                        OpenWorldHint:   false,
+                }},
+                {"search", `{
+                        "type": "object",
+                        "properties": {
+                                "path": {"type": "string", "description": "Root directory to search from"},
+                                "pattern": {"type": "string", "description": "Glob pattern matched against filenames (e.g. *.py, test_*)"},
+                                "max_results": {"type": "integer", "description": "Maximum results to return (default 100)"}
+                        },
+                        "required": ["path", "pattern"]
+                }`, &amp;shared.ToolAnnotations{
+                        Title:           "Search Files by Name",
+                        ReadOnlyHint:    true,
+                        DestructiveHint: false,
+                        IdempotentHint:  true,
+                        OpenWorldHint:   false,
+                }},
+                {"cat", `{
+                        "type": "object",
+                        "properties": {
+                                "paths": {"type": "string", "description": "Space-separated absolute paths (quote paths with spaces), or a JSON array of strings"}
+                        },
+                        "required": ["paths"]
+                }`, &amp;shared.ToolAnnotations{
+                        Title:           "Read/Concatenate Files",
+                        ReadOnlyHint:    true,
+                        DestructiveHint: false,
+                        IdempotentHint:  true,
+                        OpenWorldHint:   false,
+                }},
+                {"diff", `{
+                        "type": "object",
+                        "properties": {
+                                "file1": {"type": "string", "description": "Absolute path to first file"},
+                                "file2": {"type": "string", "description": "Absolute path to second file"},
+                                "context_lines": {"type": "integer", "description": "Lines of context around each change (default 3)"}
+                        },
+                        "required": ["file1", "file2"]
+                }`, &amp;shared.ToolAnnotations{
+                        Title:           "Diff Two Files",
+                        ReadOnlyHint:    true,
+                        DestructiveHint: false,
+                        IdempotentHint:  true,
+                        OpenWorldHint:   false,
+                }},
+                {"head", `{
+                        "type": "object",
+                        "properties": {
+                                "path": {"type": "string", "description": "Absolute file path"},
+                                "lines": {"type": "integer", "description": "Number of lines to return (default 10)"}
+                        },
+                        "required": ["path"]
+                }`, &amp;shared.ToolAnnotations{
+                        Title:           "First N Lines",
+                        ReadOnlyHint:    true,
+                        DestructiveHint: false,
+                        IdempotentHint:  true,
+                        OpenWorldHint:   false,
+                }},
+                {"info", `{
+                        "type": "object",
+                        "properties": {
+                                "path": {"type": "string", "description": "Absolute path"}
+                        },
+                        "required": ["path"]
+                }`, &amp;shared.ToolAnnotations{
+                        Title:           "File Info",
+                        ReadOnlyHint:    true,
+                        DestructiveHint: false,
+                        IdempotentHint:  true,
+                        OpenWorldHint:   false,
+                }},
+                {"mkdir", `{
+                        "type": "object",
+                        "properties": {
+                                "path": {"type": "string", "description": "Absolute directory path to create (parent directories created automatically)"}
+                        },
+                        "required": ["path"]
+                }`, &amp;shared.ToolAnnotations{
+                        Title:           "Create Directory",
+                        ReadOnlyHint:    false,
+                        DestructiveHint: false,
+                        IdempotentHint:  true,
+                        OpenWorldHint:   false,
+                }},
+                {"roots", `{
+                        "type": "object",
+                        "properties": {}
+                }`, &amp;shared.ToolAnnotations{
+                        Title:           "Allowed Roots",
+                        ReadOnlyHint:    true,
+                        DestructiveHint: false,
+                        IdempotentHint:  true,
+                        OpenWorldHint:   false,
+                }},
+                {"tail", `{
+                        "type": "object",
+                        "properties": {
+                                "path": {"type": "string", "description": "Absolute file path"},
+                                "lines": {"type": "integer", "description": "Number of lines to return (default 10)"}
+                        },
+                        "required": ["path"]
+                }`, &amp;shared.ToolAnnotations{
+                        Title:           "Last N Lines",
+                        ReadOnlyHint:    true,
+                        DestructiveHint: false,
+                        IdempotentHint:  true,
+                        OpenWorldHint:   false,
+                }},
+                {"tree", `{
+                        "type": "object",
+                        "properties": {
+                                "path": {"type": "string", "description": "Absolute directory path"},
+                                "depth": {"type": "integer", "description": "Maximum depth (default 3)"},
+                                "pattern": {"type": "string", "description": "Glob pattern to filter files (directories always shown)"}
+                        },
+                        "required": ["path"]
+                }`, &amp;shared.ToolAnnotations{
+                        Title:           "Directory Tree",
+                        ReadOnlyHint:    true,
+                        DestructiveHint: false,
+                        IdempotentHint:  true,
+                        OpenWorldHint:   false,
+                }},
+                {"wc", `{
+                        "type": "object",
+                        "properties": {
+                                "path": {"type": "string", "description": "Absolute file path"}
+                        },
+                        "required": ["path"]
+                }`, &amp;shared.ToolAnnotations{
+                        Title:           "Word Count",
+                        ReadOnlyHint:    true,
+                        DestructiveHint: false,
+                        IdempotentHint:  true,
+                        OpenWorldHint:   false,
+                }},
+        }
+        runSchema := fmt.Sprintf(`{
+                "type": "object",
+                "properties": {
+                        "command": {"type": "string", "description": "Executable path or name on PATH (e.g. powershell, python, cmd)"},
+                        "args": {"type": "string", "description": "All arguments as a single string"},
+                        "timeout": {"type": "integer", "description": "Inactivity timeout in seconds (default: %d for this tool, max: %d)"}
+                },
+                "required": ["command"]
+        }`, runDefaultTimeout, maxTimeout)
+        entries = append(entries, entry{"run", runSchema, &amp;shared.ToolAnnotations{
+                Title:           "Run Command",
+                ReadOnlyHint:    false,
+                DestructiveHint: true,
+                IdempotentHint:  false,
+                OpenWorldHint:   false,
+        }})
+        schemas := make([]shared.ToolSchema, 0, len(entries))
+        for _, e := range entries </span><span class="cov8" title="1">{
+                desc, ok := descriptions[e.name]
+                if !ok </span><span class="cov8" title="1">{
+                        return nil, fmt.Errorf("missing builtin_descriptions entry for tool %q in config", e.name)
+                }</span>
+                <span class="cov8" title="1">schemas = append(schemas, shared.ToolSchema{
+                        Name:        e.name,
+                        Description: desc,
+                        InputSchema: shared.RawJSON(e.schema),
+                        Annotations: e.annotations,
+                })</span>
+        }
+        <span class="cov8" title="1">return schemas, nil</span>
+}
+
+// positionalEntry holds a positional argument with its configured order.
+type positionalEntry struct {
+        position int
+        value    string
+}
+
+// DispatchExternalTool builds args and executes a configured external tool (§6.2).
+func DispatchExternalTool(name string, cfg shared.ToolConfig, params map[string]interface{}, maxTimeout int) (string, error) <span class="cov8" title="1">{
+        inactivityOverride := 0
+        if t, ok := shared.OptionalInt(params, "timeout"); ok </span><span class="cov0" title="0">{
+                inactivityOverride = ClampTimeout(t, maxTimeout)
+                delete(params, "timeout")
+        }</span>
+        <span class="cov8" title="1">effectiveCfg := cfg
+        if inactivityOverride &gt; 0 </span><span class="cov0" title="0">{
+                effectiveCfg.InactivityTimeout = inactivityOverride
+        }</span>
+        <span class="cov8" title="1">var args []string
+        var positionals []positionalEntry
+        for paramName, paramCfg := range cfg.Params </span><span class="cov8" title="1">{
+                val, exists := params[paramName]
+                if !exists </span><span class="cov8" title="1">{
+                        if paramCfg.Required </span><span class="cov0" title="0">{
+                                return "", fmt.Errorf("missing required parameter: %s", paramName)
+                        }</span>
+                        <span class="cov8" title="1">val = paramCfg.Default
+                        if val == nil </span><span class="cov0" title="0">{
+                                continue</span>
+                        }
+                }
+                <span class="cov8" title="1">if paramCfg.Flag != "" </span><span class="cov8" title="1">{
+                        switch paramCfg.Type </span>{
+                        case "boolean":<span class="cov8" title="1">
+                                b, ok := val.(bool)
+                                if !ok </span><span class="cov0" title="0">{
+                                        continue</span>
+                                }
+                                <span class="cov8" title="1">if b </span><span class="cov8" title="1">{
+                                        args = append(args, paramCfg.Flag)
+                                }</span>
+                        case "string":<span class="cov0" title="0">
+                                s, ok := val.(string)
+                                if !ok </span><span class="cov0" title="0">{
+                                        continue</span>
+                                }
+                                <span class="cov0" title="0">args = append(args, paramCfg.Flag, s)</span>
+                        case "integer":<span class="cov0" title="0">
+                                n, ok := val.(float64)
+                                if !ok </span><span class="cov0" title="0">{
+                                        continue</span>
+                                }
+                                <span class="cov0" title="0">args = append(args, paramCfg.Flag, fmt.Sprintf("%d", int(n)))</span>
+                        }
+                } else<span class="cov8" title="1"> {
+                        var s string
+                        switch paramCfg.Type </span>{
+                        case "string":<span class="cov8" title="1">
+                                if v, ok := val.(string); ok </span><span class="cov8" title="1">{
+                                        s = v
+                                }</span>
+                        case "integer":<span class="cov0" title="0">
+                                if v, ok := val.(float64); ok </span><span class="cov0" title="0">{
+                                        s = fmt.Sprintf("%d", int(v))
+                                }</span>
+                        case "boolean":<span class="cov0" title="0">
+                                continue</span>
+                        default:<span class="cov0" title="0">
+                                continue</span>
+                        }
+                        <span class="cov8" title="1">if s != "" </span><span class="cov8" title="1">{
+                                positionals = append(positionals, positionalEntry{
+                                        position: paramCfg.Position,
+                                        value:    s,
+                                })
+                        }</span>
+                }
+        }
+        <span class="cov8" title="1">sort.Slice(positionals, func(i, j int) bool </span><span class="cov8" title="1">{
+                return positionals[i].position &lt; positionals[j].position
+        }</span>)
+        <span class="cov8" title="1">for _, p := range positionals </span><span class="cov8" title="1">{
+                args = append(args, p.value)
+        }</span>
+        <span class="cov8" title="1">return ExecuteExternal(name, effectiveCfg, args, maxTimeout)</span>
+}
+
+// ExternalToolSchema generates an MCP tool schema from a configured tool (§6.6).
+func ExternalToolSchema(name string, cfg shared.ToolConfig, maxTimeout int) shared.ToolSchema <span class="cov8" title="1">{
+        properties := make(map[string]interface{})
+        var required []string
+        for paramName, paramCfg := range cfg.Params </span><span class="cov8" title="1">{
+                prop := map[string]interface{}{
+                        "type":        paramCfg.Type,
+                        "description": paramCfg.Description,
+                }
+                properties[paramName] = prop
+                if paramCfg.Required </span><span class="cov8" title="1">{
+                        required = append(required, paramName)
+                }</span>
+        }
+        <span class="cov8" title="1">defaultTimeout := cfg.InactivityTimeout
+        if defaultTimeout == 0 </span><span class="cov0" title="0">{
+                defaultTimeout = shared.DefaultInactivityTimeout
+        }</span>
+        <span class="cov8" title="1">properties["timeout"] = map[string]interface{}{
+                "type":        "integer",
+                "description": fmt.Sprintf("Inactivity timeout in seconds (default: %d for this tool, max: %d)", defaultTimeout, maxTimeout),
+        }
+        schema := map[string]interface{}{
+                "type":       "object",
+                "properties": properties,
+        }
+        if len(required) &gt; 0 </span><span class="cov8" title="1">{
+                schema["required"] = required
+        }</span>
+        <span class="cov8" title="1">schemaJSON, _ := json.Marshal(schema)
+        title := cfg.Title
+        if title == "" </span><span class="cov0" title="0">{
+                title = name
+        }</span>
+        <span class="cov8" title="1">annotations := &amp;shared.ToolAnnotations{
+                Title:           title,
+                ReadOnlyHint:    cfg.ReadOnly,
+                DestructiveHint: cfg.Destructive,
+                IdempotentHint:  cfg.Idempotent,
+                OpenWorldHint:   false,
+        }
+        return shared.ToolSchema{
+                Name:        name,
+                Description: cfg.Description,
+                InputSchema: schemaJSON,
+                Annotations: annotations,
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file15" style="display: none">package tools
+
+import (
+        "bufio"
+        "fmt"
+        "io"
+        "os"
+        "path/filepath"
+        "regexp"
+        "strings"
+
+        "github.com/MauriceCalvert/WinMcpShim/shared"
+)
+
+// Grep searches file contents by regex pattern (built-in fallback for external grep).
+func Grep(params map[string]interface{}, allowedRoots []string) (string, error) <span class="cov0" title="0">{
+        path, err := shared.RequireString(params, "path")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov0" title="0">pattern, err := shared.RequireString(params, "pattern")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov0" title="0">recursive, _ := shared.OptionalBool(params, "recursive")
+        ignoreCase, _ := shared.OptionalBool(params, "ignore_case")
+        lineNumbers := true
+        if ln, hasLN := shared.OptionalBool(params, "line_numbers"); hasLN </span><span class="cov0" title="0">{
+                lineNumbers = ln
+        }</span>
+        <span class="cov0" title="0">include, _ := shared.OptionalString(params, "include")
+        contextLines, _ := shared.OptionalInt(params, "context")
+        if contextLines &lt; 0 </span><span class="cov0" title="0">{
+                contextLines = 0
+        }</span>
+        <span class="cov0" title="0">maxResults, hasMax := shared.OptionalInt(params, "max_results")
+        if !hasMax || maxResults &lt;= 0 </span><span class="cov0" title="0">{
+                maxResults = 1000
+        }</span>
+
+        <span class="cov0" title="0">if pattern == "" </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("empty pattern")
+        }</span>
+
+        <span class="cov0" title="0">if ignoreCase </span><span class="cov0" title="0">{
+                pattern = "(?i)" + pattern
+        }</span>
+        <span class="cov0" title="0">re, err := regexp.Compile(pattern)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("invalid regex %q: %v", pattern, err)
+        }</span>
+
+        <span class="cov0" title="0">info, err := shared.StatWithRetry(path)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+
+        <span class="cov0" title="0">var sb strings.Builder
+        matchCount := 0
+
+        if !info.IsDir() </span><span class="cov0" title="0">{
+                // Single file
+                if err := shared.CheckPathConfinementFull(path, allowedRoots); err != nil </span><span class="cov0" title="0">{
+                        return "", err
+                }</span>
+                <span class="cov0" title="0">matchCount = grepFile(path, "", re, lineNumbers, contextLines, maxResults, &amp;sb)
+                if matchCount &gt;= maxResults </span><span class="cov0" title="0">{
+                        fmt.Fprintf(&amp;sb, "[results truncated at %d matches]\n", maxResults)
+                }</span>
+                <span class="cov0" title="0">return sb.String(), nil</span>
+        }
+
+        // Directory
+        <span class="cov0" title="0">if err := shared.CheckPathConfinement(path, allowedRoots); err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov0" title="0">if !recursive </span><span class="cov0" title="0">{
+                // Non-recursive: only files directly in path
+                entries, err := os.ReadDir(path)
+                if err != nil </span><span class="cov0" title="0">{
+                        return "", fmt.Errorf("read directory %s: %w", path, err)
+                }</span>
+                <span class="cov0" title="0">for _, entry := range entries </span><span class="cov0" title="0">{
+                        if matchCount &gt;= maxResults </span><span class="cov0" title="0">{
+                                break</span>
+                        }
+                        <span class="cov0" title="0">if entry.IsDir() </span><span class="cov0" title="0">{
+                                continue</span>
+                        }
+                        <span class="cov0" title="0">name := entry.Name()
+                        if include != "" </span><span class="cov0" title="0">{
+                                matched, _ := filepath.Match(include, name)
+                                if !matched </span><span class="cov0" title="0">{
+                                        continue</span>
+                                }
+                        }
+                        <span class="cov0" title="0">fp := filepath.Join(path, name)
+                        // Skip symlinks/junctions that resolve outside roots
+                        if shared.CheckPathConfinementFull(fp, allowedRoots) != nil </span><span class="cov0" title="0">{
+                                continue</span>
+                        }
+                        <span class="cov0" title="0">n := grepFile(fp, fp, re, lineNumbers, contextLines, maxResults-matchCount, &amp;sb)
+                        matchCount += n</span>
+                }
+                <span class="cov0" title="0">if matchCount &gt;= maxResults </span><span class="cov0" title="0">{
+                        fmt.Fprintf(&amp;sb, "[results truncated at %d matches]\n", maxResults)
+                }</span>
+                <span class="cov0" title="0">return sb.String(), nil</span>
+        }
+
+        // Recursive walk
+        <span class="cov0" title="0">filepath.WalkDir(path, func(p string, d os.DirEntry, walkErr error) error </span><span class="cov0" title="0">{
+                if walkErr != nil </span><span class="cov0" title="0">{
+                        // Permission denied or other walk errors — skip silently
+                        return nil
+                }</span>
+                <span class="cov0" title="0">if matchCount &gt;= maxResults </span><span class="cov0" title="0">{
+                        return filepath.SkipAll
+                }</span>
+                <span class="cov0" title="0">if d.IsDir() </span><span class="cov0" title="0">{
+                        return nil
+                }</span>
+                <span class="cov0" title="0">name := d.Name()
+                if include != "" </span><span class="cov0" title="0">{
+                        matched, _ := filepath.Match(include, name)
+                        if !matched </span><span class="cov0" title="0">{
+                                return nil
+                        }</span>
+                }
+                // Skip symlinks/junctions that resolve outside roots
+                <span class="cov0" title="0">if shared.CheckPathConfinementFull(p, allowedRoots) != nil </span><span class="cov0" title="0">{
+                        return nil
+                }</span>
+                <span class="cov0" title="0">n := grepFile(p, p, re, lineNumbers, contextLines, maxResults-matchCount, &amp;sb)
+                matchCount += n
+                return nil</span>
+        })
+
+        <span class="cov0" title="0">if matchCount &gt;= maxResults </span><span class="cov0" title="0">{
+                fmt.Fprintf(&amp;sb, "[results truncated at %d matches]\n", maxResults)
+        }</span>
+        <span class="cov0" title="0">return sb.String(), nil</span>
+}
+
+// grepFile searches a single file for regex matches and appends formatted output to sb.
+// prefix is the file path to include in output (empty for single-file mode).
+// Returns the number of matching lines found.
+func grepFile(path string, prefix string, re *regexp.Regexp, lineNumbers bool, contextLines int, maxResults int, sb *strings.Builder) int <span class="cov0" title="0">{
+        f, err := shared.OpenFileWithRetry(path)
+        if err != nil </span><span class="cov0" title="0">{
+                return 0
+        }</span>
+        <span class="cov0" title="0">defer f.Close()
+
+        // Read header for encoding detection
+        header := make([]byte, shared.BinaryScanSize)
+        n, _ := f.Read(header)
+        header = header[:n]
+        if n == 0 </span><span class="cov0" title="0">{
+                return 0
+        }</span>
+
+        <span class="cov0" title="0">enc, encErr := shared.DetectTextEncoding(header)
+        if encErr != nil </span><span class="cov0" title="0">{
+                // Binary file — skip silently
+                return 0
+        }</span>
+
+        <span class="cov0" title="0">var lines []string
+        if enc == shared.UTF16LE || enc == shared.UTF16BE </span><span class="cov0" title="0">{
+                // Read entire file, decode
+                f.Seek(0, io.SeekStart)
+                data, err := io.ReadAll(io.LimitReader(f, int64(shared.MaxReadSize)))
+                if err != nil </span><span class="cov0" title="0">{
+                        return 0
+                }</span>
+                <span class="cov0" title="0">decoded, err := shared.DecodeUTF16(data, enc)
+                if err != nil </span><span class="cov0" title="0">{
+                        return 0
+                }</span>
+                <span class="cov0" title="0">lines = strings.Split(decoded, "\n")
+                for i := range lines </span><span class="cov0" title="0">{
+                        lines[i] = strings.TrimRight(lines[i], "\r")
+                }</span>
+        } else<span class="cov0" title="0"> {
+                // UTF-8: scan line by line
+                f.Seek(0, io.SeekStart)
+                scanner := bufio.NewScanner(f)
+                scanner.Buffer(make([]byte, 0, 64*1024), 1024*1024)
+                for scanner.Scan() </span><span class="cov0" title="0">{
+                        lines = append(lines, scanner.Text())
+                }</span>
+        }
+
+        <span class="cov0" title="0">if contextLines &lt;= 0 </span><span class="cov0" title="0">{
+                return grepNoContext(lines, prefix, re, lineNumbers, maxResults, sb)
+        }</span>
+        <span class="cov0" title="0">return grepWithContext(lines, prefix, re, lineNumbers, contextLines, maxResults, sb)</span>
+}
+
+// grepNoContext matches lines without context.
+func grepNoContext(lines []string, prefix string, re *regexp.Regexp, lineNumbers bool, maxResults int, sb *strings.Builder) int <span class="cov0" title="0">{
+        count := 0
+        for i, line := range lines </span><span class="cov0" title="0">{
+                if count &gt;= maxResults </span><span class="cov0" title="0">{
+                        break</span>
+                }
+                <span class="cov0" title="0">if re.MatchString(line) </span><span class="cov0" title="0">{
+                        formatLine(sb, prefix, i+1, ':', line, lineNumbers)
+                        count++
+                }</span>
+        }
+        <span class="cov0" title="0">return count</span>
+}
+
+// grepWithContext matches lines with before/after context.
+func grepWithContext(lines []string, prefix string, re *regexp.Regexp, lineNumbers bool, contextLines int, maxResults int, sb *strings.Builder) int <span class="cov0" title="0">{
+        count := 0
+        lastPrinted := -1 // index of the last line we printed
+
+        for i, line := range lines </span><span class="cov0" title="0">{
+                if count &gt;= maxResults </span><span class="cov0" title="0">{
+                        break</span>
+                }
+                <span class="cov0" title="0">if !re.MatchString(line) </span><span class="cov0" title="0">{
+                        continue</span>
+                }
+                <span class="cov0" title="0">count++
+
+                // Before-context
+                start := i - contextLines
+                if start &lt; 0 </span><span class="cov0" title="0">{
+                        start = 0
+                }</span>
+                <span class="cov0" title="0">if start &lt;= lastPrinted </span><span class="cov0" title="0">{
+                        start = lastPrinted + 1
+                }</span>
+
+                // Separator if there's a gap
+                <span class="cov0" title="0">if lastPrinted &gt;= 0 &amp;&amp; start &gt; lastPrinted+1 </span><span class="cov0" title="0">{
+                        sb.WriteString("--\n")
+                }</span>
+
+                // Print before-context lines
+                <span class="cov0" title="0">for j := start; j &lt; i; j++ </span><span class="cov0" title="0">{
+                        formatLine(sb, prefix, j+1, '-', lines[j], lineNumbers)
+                }</span>
+
+                // Print match line
+                <span class="cov0" title="0">formatLine(sb, prefix, i+1, ':', line, lineNumbers)
+                lastPrinted = i
+
+                // After-context
+                end := i + contextLines
+                if end &gt;= len(lines) </span><span class="cov0" title="0">{
+                        end = len(lines) - 1
+                }</span>
+                <span class="cov0" title="0">for j := i + 1; j &lt;= end; j++ </span><span class="cov0" title="0">{
+                        if count &gt;= maxResults </span><span class="cov0" title="0">{
+                                break</span>
+                        }
+                        <span class="cov0" title="0">if re.MatchString(lines[j]) </span><span class="cov0" title="0">{
+                                // This match will be handled in the outer loop
+                                break</span>
+                        }
+                        <span class="cov0" title="0">formatLine(sb, prefix, j+1, '-', lines[j], lineNumbers)
+                        lastPrinted = j</span>
+                }
+        }
+        <span class="cov0" title="0">return count</span>
+}
+
+// formatLine writes a single output line in grep format.
+func formatLine(sb *strings.Builder, prefix string, lineNum int, sep byte, text string, lineNumbers bool) <span class="cov0" title="0">{
+        if prefix != "" </span><span class="cov0" title="0">{
+                sb.WriteString(prefix)
+                if lineNumbers </span><span class="cov0" title="0">{
+                        fmt.Fprintf(sb, "%c%d%c%s\n", sep, lineNum, sep, text)
+                }</span> else<span class="cov0" title="0"> {
+                        sb.WriteByte(sep)
+                        sb.WriteString(text)
+                        sb.WriteByte('\n')
+                }</span>
+        } else<span class="cov0" title="0"> {
+                if lineNumbers </span><span class="cov0" title="0">{
+                        fmt.Fprintf(sb, "%d%c%s\n", lineNum, sep, text)
+                }</span> else<span class="cov0" title="0"> {
+                        sb.WriteString(text)
+                        sb.WriteByte('\n')
+                }</span>
+        }
+}
+
+// BuiltinGrepSchema returns the MCP tool schema for the built-in grep.
+func BuiltinGrepSchema(description string) shared.ToolSchema <span class="cov8" title="1">{
+        return shared.ToolSchema{
+                Name:        "grep",
+                Description: description,
+                InputSchema: shared.RawJSON(`{
+                        "type": "object",
+                        "properties": {
+                                "path": {"type": "string", "description": "Absolute path to file or directory to search"},
+                                "pattern": {"type": "string", "description": "Regular expression pattern (RE2 syntax)"},
+                                "recursive": {"type": "boolean", "description": "Search directories recursively (default false)"},
+                                "ignore_case": {"type": "boolean", "description": "Case-insensitive matching (default false)"},
+                                "line_numbers": {"type": "boolean", "description": "Show line numbers (default true)"},
+                                "include": {"type": "string", "description": "Glob pattern to filter filenames (e.g. *.py)"},
+                                "context": {"type": "integer", "description": "Lines of context around each match"},
+                                "max_results": {"type": "integer", "description": "Maximum matching lines to return (default 1000)"}
+                        },
+                        "required": ["path", "pattern"]
+                }`),
+                Annotations: &amp;shared.ToolAnnotations{
+                        Title:           "Grep (Content Search)",
+                        ReadOnlyHint:    true,
+                        DestructiveHint: false,
+                        IdempotentHint:  true,
+                        OpenWorldHint:   false,
+                },
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file16" style="display: none">package tools
+
+import (
+        "bytes"
+        "context"
+        "fmt"
+        "os/exec"
+        "strings"
+        "sync"
+        "time"
+
+        "github.com/MauriceCalvert/WinMcpShim/shared"
+)
+
+// ExecOpts carries all parameters for ExecuteWithTimeouts.
+type ExecOpts struct {
+        InactivityTimeout time.Duration
+        TotalTimeout      time.Duration
+        MaxOutput         int
+        ToolName          string // for diagnostic messages (§6.3)
+        MaxTimeout        int    // max allowed timeout, for diagnostic messages (§6.6)
+}
+
+// ExecResult holds the outcome of a child process execution.
+type ExecResult struct {
+        Stdout   string
+        Stderr   string
+        ExitCode int
+        Timeout  string // non-empty if killed by timeout
+}
+
+// Run executes an arbitrary command (§5.11).
+func Run(params map[string]interface{}, allowedRoots []string, runCfg shared.RunConfig, maxTimeout int) (string, error) <span class="cov8" title="1">{
+        command, err := shared.RequireString(params, "command")
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">if err := shared.CheckCommandConfinement(command, allowedRoots); err != nil </span><span class="cov8" title="1">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">argsStr, _ := shared.OptionalString(params, "args")
+        var args []string
+        if argsStr != "" </span><span class="cov8" title="1">{
+                args = SplitArgs(argsStr)
+        }</span>
+        <span class="cov8" title="1">inactivitySec := runCfg.InactivityTimeout
+        if t, ok := shared.OptionalInt(params, "timeout"); ok </span><span class="cov8" title="1">{
+                inactivitySec = ClampTimeout(t, maxTimeout)
+        }</span>
+        <span class="cov8" title="1">opts := ExecOpts{
+                InactivityTimeout: time.Duration(inactivitySec) * time.Second,
+                TotalTimeout:      time.Duration(runCfg.TotalTimeout) * time.Second,
+                MaxOutput:         runCfg.MaxOutput,
+                ToolName:          "run",
+                MaxTimeout:        maxTimeout,
+        }
+        result, err := ExecuteWithTimeouts(command, args, opts)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">if result.Timeout != "" </span><span class="cov8" title="1">{
+                return "", fmt.Errorf("%s", result.Timeout)
+        }</span>
+        <span class="cov8" title="1">return FormatRunResult(result), nil</span>
+}
+
+// FormatRunResult formats stdout, stderr, and exit code for the run tool (§6.4).
+func FormatRunResult(r ExecResult) string <span class="cov8" title="1">{
+        var sb strings.Builder
+        if r.Stdout != "" </span><span class="cov8" title="1">{
+                sb.WriteString(r.Stdout)
+        }</span>
+        <span class="cov8" title="1">if r.Stderr != "" </span><span class="cov8" title="1">{
+                if sb.Len() &gt; 0 </span><span class="cov8" title="1">{
+                        sb.WriteString("\n--- stderr ---\n")
+                }</span>
+                <span class="cov8" title="1">sb.WriteString(r.Stderr)</span>
+        }
+        <span class="cov8" title="1">if r.ExitCode != 0 </span><span class="cov8" title="1">{
+                fmt.Fprintf(&amp;sb, "\n[exit code: %d]", r.ExitCode)
+        }</span>
+        <span class="cov8" title="1">return sb.String()</span>
+}
+
+// ClampTimeout clamps a timeout value to [1, maxTimeout] (§6.6).
+func ClampTimeout(t int, maxTimeout int) int <span class="cov8" title="1">{
+        if t &lt; 1 </span><span class="cov0" title="0">{
+                return 1
+        }</span>
+        <span class="cov8" title="1">if t &gt; maxTimeout </span><span class="cov8" title="1">{
+                return maxTimeout
+        }</span>
+        <span class="cov8" title="1">return t</span>
+}
+
+// ExecuteWithTimeouts runs a command with concurrent pipe draining (§9.5),
+// inactivity and total timeouts (§6.3), Job Objects and WER suppression (§9.8),
+// output size limit (§6.5), and proper kill/cleanup sequence (§9.8).
+func ExecuteWithTimeouts(command string, args []string, opts ExecOpts) (ExecResult, error) <span class="cov8" title="1">{
+        ctx, cancel := context.WithTimeout(context.Background(), opts.TotalTimeout)
+        defer cancel()
+        cmd := exec.CommandContext(ctx, command, args...)
+        shared.SetupChildProcess(cmd)
+        cmd.Stdin = nil
+        stdoutPipe, err := cmd.StdoutPipe()
+        if err != nil </span><span class="cov0" title="0">{
+                return ExecResult{}, fmt.Errorf("create stdout pipe: %w", err)
+        }</span>
+        <span class="cov8" title="1">stderrPipe, err := cmd.StderrPipe()
+        if err != nil </span><span class="cov0" title="0">{
+                return ExecResult{}, fmt.Errorf("create stderr pipe: %w", err)
+        }</span>
+        <span class="cov8" title="1">if err := cmd.Start(); err != nil </span><span class="cov0" title="0">{
+                return ExecResult{}, fmt.Errorf("start %s: %w", command, err)
+        }</span>
+        <span class="cov8" title="1">job, _ := shared.CreateJobObject()
+        if job != shared.NoJobHandle </span><span class="cov8" title="1">{
+                if err := shared.AssignToJobObject(job, cmd.Process); err != nil </span><span class="cov0" title="0">{
+                        shared.CloseJobObject(job)
+                        job = shared.NoJobHandle
+                }</span>
+        }
+        <span class="cov8" title="1">defer cmd.Wait()
+        defer func() </span><span class="cov8" title="1">{ shared.CloseJobObject(job) }</span>()
+        <span class="cov8" title="1">var stdoutBuf, stderrBuf bytes.Buffer
+        var mu sync.Mutex
+        truncated := false
+        stderrTruncated := false
+        truncChan := make(chan struct{}, 1)
+        timer := time.NewTimer(opts.InactivityTimeout)
+        defer timer.Stop()
+        var wg sync.WaitGroup
+        wg.Add(2)
+        go func() </span><span class="cov8" title="1">{
+                defer wg.Done()
+                buf := make([]byte, 4096)
+                for </span><span class="cov8" title="1">{
+                        n, readErr := stdoutPipe.Read(buf)
+                        if n &gt; 0 </span><span class="cov8" title="1">{
+                                mu.Lock()
+                                timer.Reset(opts.InactivityTimeout)
+                                remaining := opts.MaxOutput - stdoutBuf.Len()
+                                if remaining &gt; 0 </span><span class="cov8" title="1">{
+                                        writeN := n
+                                        if writeN &gt; remaining </span><span class="cov8" title="1">{
+                                                writeN = remaining
+                                        }</span>
+                                        <span class="cov8" title="1">stdoutBuf.Write(buf[:writeN])
+                                        if writeN &lt; n </span><span class="cov8" title="1">{
+                                                truncated = true
+                                        }</span>
+                                } else<span class="cov8" title="1"> {
+                                        truncated = true
+                                }</span>
+                                <span class="cov8" title="1">wasTrunc := truncated
+                                mu.Unlock()
+                                if wasTrunc </span><span class="cov8" title="1">{
+                                        select </span>{
+                                        case truncChan &lt;- struct{}{}:<span class="cov8" title="1"></span>
+                                        default:<span class="cov0" title="0"></span>
+                                        }
+                                        <span class="cov8" title="1">return</span>
+                                }
+                        }
+                        <span class="cov8" title="1">if readErr != nil </span><span class="cov8" title="1">{
+                                return
+                        }</span>
+                }
+        }()
+        <span class="cov8" title="1">go func() </span><span class="cov8" title="1">{
+                defer wg.Done()
+                buf := make([]byte, 4096)
+                for </span><span class="cov8" title="1">{
+                        n, readErr := stderrPipe.Read(buf)
+                        if n &gt; 0 </span><span class="cov8" title="1">{
+                                mu.Lock()
+                                timer.Reset(opts.InactivityTimeout)
+                                remaining := opts.MaxOutput - stderrBuf.Len()
+                                if remaining &gt; 0 </span><span class="cov8" title="1">{
+                                        writeN := n
+                                        if writeN &gt; remaining </span><span class="cov0" title="0">{
+                                                writeN = remaining
+                                        }</span>
+                                        <span class="cov8" title="1">stderrBuf.Write(buf[:writeN])
+                                        if writeN &lt; n </span><span class="cov0" title="0">{
+                                                stderrTruncated = true
+                                        }</span>
+                                } else<span class="cov0" title="0"> {
+                                        stderrTruncated = true
+                                }</span>
+                                <span class="cov8" title="1">mu.Unlock()</span>
+                        }
+                        <span class="cov8" title="1">if readErr != nil </span><span class="cov8" title="1">{
+                                return
+                        }</span>
+                }
+        }()
+        <span class="cov8" title="1">pipeDone := make(chan struct{})
+        go func() </span><span class="cov8" title="1">{
+                wg.Wait()
+                close(pipeDone)
+        }</span>()
+        <span class="cov8" title="1">type termCause int
+        const (
+                causeNormal termCause = iota
+                causeInactivity
+                causeTotal
+                causeTruncation
+        )
+        cause := causeNormal
+        killTree := func() </span><span class="cov8" title="1">{
+                shared.CloseJobObject(job)
+                job = shared.NoJobHandle
+                cmd.Process.Kill()
+        }</span>
+        <span class="cov8" title="1">select </span>{
+        case &lt;-pipeDone:<span class="cov8" title="1"></span>
+                // Normal completion.
+        case &lt;-timer.C:<span class="cov8" title="1">
+                cause = causeInactivity
+                killTree()
+                &lt;-pipeDone</span>
+        case &lt;-ctx.Done():<span class="cov8" title="1">
+                cause = causeTotal
+                killTree()
+                &lt;-pipeDone</span>
+        case &lt;-truncChan:<span class="cov8" title="1">
+                cause = causeTruncation
+                killTree()
+                &lt;-pipeDone</span>
+        }
+        <span class="cov8" title="1">switch cause </span>{
+        case causeInactivity:<span class="cov8" title="1">
+                return ExecResult{
+                        Timeout: fmt.Sprintf("winmcpshim: %s produced no output for %d seconds.\nYou can retry with a higher timeout (max %d).",
+                                opts.ToolName, int(opts.InactivityTimeout.Seconds()), opts.MaxTimeout),
+                }, nil</span>
+        case causeTotal:<span class="cov8" title="1">
+                return ExecResult{
+                        Timeout: fmt.Sprintf("winmcpshim: %s exceeded total timeout of %d seconds.",
+                                opts.ToolName, int(opts.TotalTimeout.Seconds())),
+                }, nil</span>
+        }
+        <span class="cov8" title="1">waitErr := cmd.Wait()
+        exitCode := 0
+        if waitErr != nil </span><span class="cov8" title="1">{
+                if exitErr, ok := waitErr.(*exec.ExitError); ok </span><span class="cov8" title="1">{
+                        exitCode = exitErr.ExitCode()
+                }</span> else<span class="cov0" title="0"> if ctx.Err() != nil </span><span class="cov0" title="0">{
+                        return ExecResult{
+                                Timeout: fmt.Sprintf("winmcpshim: %s exceeded total timeout of %d seconds.",
+                                        opts.ToolName, int(opts.TotalTimeout.Seconds())),
+                        }, nil
+                }</span> else<span class="cov0" title="0"> {
+                        return ExecResult{}, fmt.Errorf("wait %s: %w", command, waitErr)
+                }</span>
+        }
+        <span class="cov8" title="1">mu.Lock()
+        stdout := stdoutBuf.String()
+        wasTrunc := truncated
+        stderr := stderrBuf.String()
+        wasStderrTrunc := stderrTruncated
+        mu.Unlock()
+        if wasTrunc </span><span class="cov8" title="1">{
+                stdout += fmt.Sprintf("\n[truncated -- output exceeded %d KB]", opts.MaxOutput/1024)
+        }</span>
+        <span class="cov8" title="1">if wasStderrTrunc </span><span class="cov0" title="0">{
+                stderr += "\n[stderr truncated]"
+        }</span>
+        <span class="cov8" title="1">return ExecResult{
+                Stdout:   stdout,
+                Stderr:   stderr,
+                ExitCode: exitCode,
+        }, nil</span>
+}
+
+// SplitArgs splits a command-line argument string into individual arguments (§5.11).
+func SplitArgs(s string) []string <span class="cov8" title="1">{
+        var args []string
+        var current strings.Builder
+        inQuote := false
+        quoteChar := byte(0)
+        for i := 0; i &lt; len(s); i++ </span><span class="cov8" title="1">{
+                c := s[i]
+                if inQuote </span><span class="cov8" title="1">{
+                        if c == quoteChar </span><span class="cov8" title="1">{
+                                inQuote = false
+                        }</span> else<span class="cov8" title="1"> {
+                                current.WriteByte(c)
+                        }</span>
+                } else<span class="cov8" title="1"> if c == '"' || c == '\'' </span><span class="cov8" title="1">{
+                        inQuote = true
+                        quoteChar = c
+                }</span> else<span class="cov8" title="1"> if c == ' ' || c == '\t' </span><span class="cov8" title="1">{
+                        if current.Len() &gt; 0 </span><span class="cov8" title="1">{
+                                args = append(args, current.String())
+                                current.Reset()
+                        }</span>
+                } else<span class="cov8" title="1"> {
+                        current.WriteByte(c)
+                }</span>
+        }
+        <span class="cov8" title="1">if current.Len() &gt; 0 </span><span class="cov8" title="1">{
+                args = append(args, current.String())
+        }</span>
+        <span class="cov8" title="1">return args</span>
+}
+
+// ExecuteExternal runs a configured external tool with proper lifecycle management.
+func ExecuteExternal(name string, toolCfg shared.ToolConfig, args []string, maxTimeout int) (string, error) <span class="cov8" title="1">{
+        inactivity := time.Duration(toolCfg.InactivityTimeout) * time.Second
+        if inactivity == 0 </span><span class="cov0" title="0">{
+                inactivity = time.Duration(shared.DefaultInactivityTimeout) * time.Second
+        }</span>
+        <span class="cov8" title="1">total := time.Duration(toolCfg.TotalTimeout) * time.Second
+        if total == 0 </span><span class="cov0" title="0">{
+                total = time.Duration(shared.DefaultTotalTimeout) * time.Second
+        }</span>
+        <span class="cov8" title="1">maxOutput := toolCfg.MaxOutput
+        if maxOutput == 0 </span><span class="cov0" title="0">{
+                maxOutput = shared.DefaultMaxOutput
+        }</span>
+        <span class="cov8" title="1">opts := ExecOpts{
+                InactivityTimeout: inactivity,
+                TotalTimeout:      total,
+                MaxOutput:         maxOutput,
+                ToolName:          name,
+                MaxTimeout:        maxTimeout,
+        }
+        result, err := ExecuteWithTimeouts(toolCfg.Exe, args, opts)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov8" title="1">if result.Timeout != "" </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("%s", result.Timeout)
+        }</span>
+        <span class="cov8" title="1">isSuccess := false
+        if len(toolCfg.SuccessCodes) == 0 </span><span class="cov0" title="0">{
+                isSuccess = result.ExitCode == 0
+        }</span> else<span class="cov8" title="1"> {
+                for _, code := range toolCfg.SuccessCodes </span><span class="cov8" title="1">{
+                        if result.ExitCode == code </span><span class="cov8" title="1">{
+                                isSuccess = true
+                                break</span>
+                        }
+                }
+        }
+        <span class="cov8" title="1">var sb strings.Builder
+        sb.WriteString(result.Stdout)
+        if result.Stderr != "" </span><span class="cov0" title="0">{
+                if sb.Len() &gt; 0 </span><span class="cov0" title="0">{
+                        sb.WriteString("\n--- stderr ---\n")
+                }</span>
+                <span class="cov0" title="0">sb.WriteString(result.Stderr)</span>
+        }
+        <span class="cov8" title="1">if !isSuccess </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("exit code %d: %s", result.ExitCode, sb.String())
+        }</span>
+        <span class="cov8" title="1">return sb.String(), nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

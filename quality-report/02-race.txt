@@ -1,0 +1,9 @@
+﻿--- Shim (race) ---
+ok  	github.com/MauriceCalvert/WinMcpShim/shim	45.933s
+
+--- Tools (race) ---
+ok  	github.com/MauriceCalvert/WinMcpShim/tools	3.677s
+
+--- Shared (race) ---
+ok  	github.com/MauriceCalvert/WinMcpShim/shared	1.497s
+

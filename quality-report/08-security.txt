@@ -1,0 +1,90 @@
+﻿SECURITY SURFACE REVIEW
+=======================
+
+1. CONFINEMENT CHECKS
+
+--- tools\builtin.go ---
+20: func Read(params map[string]interface{}, allowedRoots []string) (string, error) {
+25: if err := shared.CheckPathConfinementFull(path, allowedRoots); err != nil {
+142: func Write(params map[string]interface{}, allowedRoots []string) (string, error) {
+147: if err := shared.CheckPathConfinement(path, allowedRoots); err != nil {
+180: func Copy(params map[string]interface{}, allowedRoots []string) (string, error) {
+189: if err := shared.CheckPathConfinement(source, allowedRoots); err != nil {
+192: if err := shared.CheckPathConfinement(destination, allowedRoots); err != nil {
+213: func Move(params map[string]interface{}, allowedRoots []string) (string, error) {
+222: if err := shared.CheckPathConfinement(source, allowedRoots); err != nil {
+225: if err := shared.CheckPathConfinement(destination, allowedRoots); err != nil {
+238: func Delete(params map[string]interface{}, allowedRoots []string) (string, error) {
+243: if err := shared.CheckPathConfinement(path, allowedRoots); err != nil {
+256: func List(params map[string]interface{}, allowedRoots []string) (string, error) {
+261: if err := shared.CheckPathConfinement(path, allowedRoots); err != nil {
+292: func Search(params map[string]interface{}, allowedRoots []string) (string, error) {
+297: if err := shared.CheckPathConfinement(path, allowedRoots); err != nil {
+326: func Info(params map[string]interface{}, allowedRoots []string) (string, error) {
+331: if err := shared.CheckPathConfinementFull(path, allowedRoots); err != nil {
+349: func Cat(params map[string]interface{}, allowedRoots []string) (string, error) {
+371: if err := shared.CheckPathConfinementFull(p, allowedRoots); err != nil {
+426: func Diff(params map[string]interface{}, allowedRoots []string) (string, error) {
+435: if err := shared.CheckPathConfinementFull(file1, allowedRoots); err != nil {
+438: if err := shared.CheckPathConfinementFull(file2, allowedRoots); err != nil {
+599: func Head(params map[string]interface{}, allowedRoots []string) (string, error) {
+604: if err := shared.CheckPathConfinementFull(path, allowedRoots); err != nil {
+656: func Mkdir(params map[string]interface{}, allowedRoots []string) (string, error) {
+661: if err := shared.CheckPathConfinement(path, allowedRoots); err != nil {
+672: if len(cfg.Security.AllowedRoots) == 0 {
+675: return strings.Join(cfg.Security.AllowedRoots, "\n"), nil
+679: func Tail(params map[string]interface{}, allowedRoots []string) (string, error) {
+684: if err := shared.CheckPathConfinementFull(path, allowedRoots); err != nil {
+835: func Tree(params map[string]interface{}, allowedRoots []string) (string, error) {
+840: if err := shared.CheckPathConfinement(path, allowedRoots); err != nil {
+889: func Wc(params map[string]interface{}, allowedRoots []string) (string, error) {
+894: if err := shared.CheckPathConfinementFull(path, allowedRoots); err != nil {
+
+--- tools\external.go ---
+
+--- tools\run.go ---
+33: func Run(params map[string]interface{}, allowedRoots []string, runCfg shared.RunConfig, maxTimeout int) (string, error) {
+38: if err := shared.CheckCommandConfinement(command, allowedRoots); err != nil {
+
+--- tools\grep.go ---
+16: func Grep(params map[string]interface{}, allowedRoots []string) (string, error) {
+63: if err := shared.CheckPathConfinementFull(path, allowedRoots); err != nil {
+74: if err := shared.CheckPathConfinement(path, allowedRoots); err != nil {
+99: if shared.CheckPathConfinementFull(fp, allowedRoots) != nil {
+131: if shared.CheckPathConfinementFull(p, allowedRoots) != nil {
+
+--- shared\security.go ---
+17: func (e *ConfinementError) Error() string {
+23: func CheckPathConfinement(path string, allowedRoots []string) error {
+33: func CheckPathConfinementFull(path string, allowedRoots []string) error {
+47: func CheckResolvedPathConfinement(path string, allowedRoots []string) error {
+73: func CheckCommandConfinement(command string, allowedRoots []string) error {
+
+--- tools\edit.go ---
+15: func Edit(params map[string]interface{}, allowedRoots []string) (string, error) {
+20: if err := shared.CheckPathConfinement(path, allowedRoots); err != nil {
+
+2. POST-CHECK (GetFinalPathNameByHandle) usage:
+
+security.go:37: if err := VerifyPathByHandle(path, allowedRoots); err != nil {
+security.go:81: return VerifyCommandByHandle(command, allowedRoots)
+security_other.go:5: // VerifyPathByHandle is a no-op on non-Windows platforms.
+security_other.go:6: func VerifyPathByHandle(path string, allowedRoots []string) error {
+security_other.go:10: // VerifyCommandByHandle is a no-op on non-Windows platforms.
+security_other.go:11: func VerifyCommandByHandle(path string, allowedRoots []string) error {
+security_test.go:157: // May error because file doesn't exist (VerifyPathByHandle), but should not panic
+security_windows.go:13: // VerifyPathByHandle opens the path, calls GetFinalPathNameByHandle to resolve
+security_windows.go:15: func VerifyPathByHandle(path string, allowedRoots []string) error {
+security_windows.go:30: n, err := windows.GetFinalPathNameByHandle(h, &buf[0], uint32(len(buf)), 0)
+security_windows.go:32: return fmt.Errorf("GetFinalPathNameByHandle: %w", err)
+security_windows.go:39: // VerifyCommandByHandle checks that an absolute command path resolves (after symlinks)
+security_windows.go:41: func VerifyCommandByHandle(path string, allowedRoots []string) error {
+security_windows.go:42: return VerifyPathByHandle(path, allowedRoots)
+
+3. SHELL INVOCATION CHECK (production code only):
+
+external.go:304: "command": {"type": "string", "description": "Executable path or name on PATH (e.g. powershell, python, cmd)"},
+
+4. OS.REMOVEALL CHECK:
+
+   GOOD: No RemoveAll in production code.

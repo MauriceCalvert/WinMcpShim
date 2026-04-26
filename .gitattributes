@@ -1,0 +1,11 @@
+# Binary files — no CRLF conversion, no diff
+*.ico binary
+*.exe binary
+*.dat binary
+
+# Archives
+*.tar binary
+*.tar.gz binary
+
+# Coverage profiles
+*.out binary
