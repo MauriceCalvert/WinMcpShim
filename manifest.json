@@ -3,7 +3,7 @@
   "manifest_version": "0.3",
   "name": "winmcpshim",
   "display_name": "WinMcpShim",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Fast native Windows file, text, and command utilities.",
   "long_description": "WinMcpShim is an MCP server for Windows providing a complete set of file, directory, and text utilities (cat, grep, head, tail, diff, edit, tree, etc.) plus an allowlisted shell runner. Implemented as a single statically-linked Go binary with no runtime dependencies. Benchmarks show ~7.8 times faster cold start and ~22.9 times faster single-file grep than Python/Node reference MCP servers. Developed to DO-178C avionics practices: 503 tests, 88% merged coverage, integration tests against adversarial child processes (pipe flooding, crashes, grandchild spawning), TOCTOU-hardened path confinement via GetFinalPathNameByHandle, and an explicit allowlist for the run tool.",
   "author": {

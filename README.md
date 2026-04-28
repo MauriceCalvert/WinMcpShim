@@ -398,6 +398,25 @@ Maximum tool-call timeout** for the MCPB install path, or by
 increasing `max_timeout` in `shim.toml` for the installer and
 manual paths.
 
+**`run` tool rejects a command ("not on the run allowlist"):**
+At call time the shim resolves the requested executable to an absolute
+path, then permits it only if (a) the path lies inside `allowed_roots`,
+or (b) the path matches an entry in `run.allowed_commands`. The error
+message lists the live allowlist as resolved at startup — read that
+list, not the one you remember writing. Two failure modes follow.
+*Wrong allowlist:* the executable lives outside the roots (e.g.
+`cmd.exe` in `C:\Windows\System32`) and isn't permitted. Add it via
+**Settings → Extensions → WinMcpShim** (MCPB), `config.cmd` (installer
+or manual), or by editing `run.allowed_commands` in the active
+`shim.toml`, then restart Claude Desktop. *Edited the wrong file:* you
+changed a `shim.toml` and nothing happened. The shim reads the
+`shim.toml` beside the running `winmcpshim.exe`. If you have the source
+repo, the project's `shim.toml` is a working template — the installer
+copies it to the install directory once, and from then on only the
+install directory's copy is read. `config.cmd` locates the active file
+via `claude_desktop_config.json` and edits the right one regardless of
+where you launch it from.
+
 **External tools not working:**
 The configured external tools (sed, awk, sort, xxd, etc.) require
 [Git for Windows](https://gitforwindows.org/). Verify it is
