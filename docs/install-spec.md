@@ -239,6 +239,7 @@ Claude processes exit:
 | INS-10   | The `allowed_roots` block in shim.toml is replaced with validated paths formatted as a TOML string array with double-backslash escaping |
 | INS-11   | All `exe = "..."` values in `[tools.*]` sections are updated to use the discovered Git `usr\bin` path |
 | INS-12   | The `[scan_dirs]` `paths` array is updated to use the discovered Git `usr\bin` path |
+| INS-12a  | If Git for Windows is found, `<gitRoot>\cmd\git.exe` is appended to `run.allowed_commands` so the run tool can invoke `git` by bare name. Idempotent: re-running the installer leaves any user-added entries intact and only inserts git.exe if absent (case-insensitive match) |
 | INS-13   | `C:\Windows\System32\tar.exe` is verified to exist. If absent -> WARN (tar tool unavailable, not fatal) |
 
 **TOML handling strategy:** The toml file is read and modified as
@@ -259,6 +260,13 @@ The text operations are:
   replaces every occurrence of `C:\\Program Files\\Git\\usr\\bin`
   (the template default) with the escaped discovered path.
   Also replaces the unescaped form in `scan_dirs`.
+
+- `AddAllowedCommand(content string, cmd string) (string, error)` —
+  ensures `cmd` appears in `run.allowed_commands`, preserving any
+  existing entries. Reads the current array via the TOML decoder,
+  performs case-insensitive membership test, and rewrites the
+  block via `SetAllowedCommands` only when an addition is needed.
+  Idempotent.
 
 Both are pure functions: string in, string out. The caller
 handles file I/O.
@@ -452,6 +460,7 @@ executable names.
 | `GetTomlState`      | `(path string) TomlState`                             | No   | INS-08, INS-08a, INS-08b |
 | `SetAllowedRoots`   | `(content string, roots []string) (string, error)`    | Yes  | INS-10 |
 | `SetGitPaths`       | `(content string, gitUsrBin string) (string, error)`  | Yes  | INS-11, INS-12 |
+| `AddAllowedCommand` | `(content string, cmd string) (string, error)`        | Yes  | INS-12a |
 | `ValidateToml`      | `(content string) error`                              | Yes  | §6.4 |
 | `ValidateRoot`      | `(path string) (string, error)`                       | No   | INS-09 |
 | `ValidateRoots`     | `(paths []string) ([]string, []string)`               | No   | INS-09, INS-09a, INS-09b |
@@ -707,6 +716,7 @@ These test the full pipeline and require the real
 | INS-10 | toml.go | `SetAllowedRoots`, `FormatTomlRoots` | T-32..T-36, T-42..T-45 | OK |
 | INS-11 | toml.go | `SetGitPaths` | T-37..T-39, T-41, T-47 | OK |
 | INS-12 | toml.go | `SetGitPaths` | T-40, T-47 | OK |
+| INS-12a | toml.go, cmd/install/main.go | `AddAllowedCommand` | T-49..T-53 | OK |
 | INS-13 | discover.go | `CheckTarExe` | T-13 | OK |
 | INS-14 | cmd/install/main.go | (interactive) | manual | OK |
 | INS-14a | cmd/install/main.go | (interactive) | manual | OK |

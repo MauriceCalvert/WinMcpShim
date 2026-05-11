@@ -224,6 +224,29 @@ func buildPlan(shimDir string, checks []installer.CheckResult) installer.Plan {
 
 // execute performs all Pass 3 steps with undo tracking.
 func execute(plan installer.Plan, undo *installer.UndoStack) error {
+	// ensureTomlBackup creates a single shim.toml backup the first time it is
+	// called within this execute(); subsequent calls are no-ops. Keeps the
+	// three conditional toml-modification steps (allowed_roots, Git paths,
+	// run.allowed_commands) from each having to know about the others.
+	tomlBackedUp := false
+	ensureTomlBackup := func() error {
+		if tomlBackedUp {
+			return nil
+		}
+		bakPath, err := installer.BackupFile(plan.TomlPath)
+		if err != nil {
+			return fmt.Errorf("backup shim.toml: %w", err)
+		}
+		undo.Push("restore shim.toml from backup", func() error {
+			data, err := os.ReadFile(bakPath)
+			if err != nil {
+				return err
+			}
+			return installer.WriteAtomic(plan.TomlPath, data)
+		})
+		tomlBackedUp = true
+		return nil
+	}
 	// Step 1: Create shim.toml from example if missing.
 	if plan.TomlState == installer.TomlMissing {
 		fmt.Println("  Creating shim.toml from template...")
@@ -246,17 +269,9 @@ func execute(plan installer.Plan, undo *installer.UndoStack) error {
 		if err != nil {
 			return fmt.Errorf("read shim.toml: %w", err)
 		}
-		bakPath, err := installer.BackupFile(plan.TomlPath)
-		if err != nil {
-			return fmt.Errorf("backup shim.toml: %w", err)
+		if err := ensureTomlBackup(); err != nil {
+			return err
 		}
-		undo.Push("restore shim.toml from backup", func() error {
-			data, err := os.ReadFile(bakPath)
-			if err != nil {
-				return err
-			}
-			return installer.WriteAtomic(plan.TomlPath, data)
-		})
 		modified, err := installer.SetAllowedRoots(string(content), plan.AllowedRoots)
 		if err != nil {
 			return fmt.Errorf("set allowed_roots: %w", err)
@@ -275,19 +290,8 @@ func execute(plan installer.Plan, undo *installer.UndoStack) error {
 		if err != nil {
 			return fmt.Errorf("read shim.toml: %w", err)
 		}
-		// Backup if step 2 didn't already do so.
-		if len(plan.AllowedRoots) == 0 {
-			bakPath, err := installer.BackupFile(plan.TomlPath)
-			if err != nil {
-				return fmt.Errorf("backup shim.toml: %w", err)
-			}
-			undo.Push("restore shim.toml from backup", func() error {
-				data, err := os.ReadFile(bakPath)
-				if err != nil {
-					return err
-				}
-				return installer.WriteAtomic(plan.TomlPath, data)
-			})
+		if err := ensureTomlBackup(); err != nil {
+			return err
 		}
 		modified, err := installer.SetGitPaths(string(content), plan.GitUsrBin)
 		if err != nil {
@@ -300,7 +304,35 @@ func execute(plan installer.Plan, undo *installer.UndoStack) error {
 			return fmt.Errorf("write shim.toml: %w", err)
 		}
 	}
-	// Step 4: Create log directory (INS-15).
+	// Step 4: Add git.exe to run.allowed_commands when Git is found, so the
+	// run tool can invoke `git` by bare name without the user having to add
+	// Git\cmd to allowed_roots manually (INS-12a). Idempotent: re-running
+	// install over an existing shim.toml leaves any user-added entries
+	// intact and only inserts git.exe if absent.
+	if plan.GitRoot != "" {
+		gitExe := filepath.Join(plan.GitRoot, "cmd", "git.exe")
+		content, err := os.ReadFile(plan.TomlPath)
+		if err != nil {
+			return fmt.Errorf("read shim.toml: %w", err)
+		}
+		modified, err := installer.AddAllowedCommand(string(content), gitExe)
+		if err != nil {
+			return fmt.Errorf("add git.exe to allowed_commands: %w", err)
+		}
+		if modified != string(content) {
+			fmt.Println("  Adding git.exe to run.allowed_commands...")
+			if err := ensureTomlBackup(); err != nil {
+				return err
+			}
+			if err := installer.ValidateToml(modified); err != nil {
+				return fmt.Errorf("toml validation after AddAllowedCommand: %w", err)
+			}
+			if err := installer.WriteAtomic(plan.TomlPath, []byte(modified)); err != nil {
+				return fmt.Errorf("write shim.toml: %w", err)
+			}
+		}
+	}
+	// Step 5: Create log directory (INS-15).
 	logDirCreated := false
 	if _, err := os.Stat(plan.LogDir); os.IsNotExist(err) {
 		fmt.Printf("  Creating log directory: %s\n", plan.LogDir)
@@ -313,13 +345,13 @@ func execute(plan installer.Plan, undo *installer.UndoStack) error {
 		})
 	}
 	_ = logDirCreated
-	// Step 5: Verify log dir writable (INS-15a).
+	// Step 6: Verify log dir writable (INS-15a).
 	testFile := filepath.Join(plan.LogDir, ".install-write-test")
 	if err := os.WriteFile(testFile, []byte("test"), 0644); err != nil {
 		return fmt.Errorf("log directory %s is not writable: %w", plan.LogDir, err)
 	}
 	os.Remove(testFile)
-	// Step 6 & 7: Claude Desktop config.
+	// Step 7 & 8: Claude Desktop config.
 	fmt.Println("  Configuring Claude Desktop...")
 	if plan.ConfigExists {
 		// Read, backup, update.

@@ -36,7 +36,7 @@ func shimMain() int {
 	sanitizedRoots, rootWarnings := shared.SanitizeAllowedRoots(cfg.Security.AllowedRoots)
 	cfg.Security.AllowedRoots = sanitizedRoots
 	resolvedCommands, allowlistWarnings := shared.ResolveAllowedCommands(cfg.Run.AllowedCommands)
-	cfg.Run.AllowedCommands = resolvedCommands
+	cfg.Run.AllowedCommands = shared.AugmentAllowedCommandsWithGit(resolvedCommands)
 	if flags.scan {
 		runScan(cfg)
 		return 0

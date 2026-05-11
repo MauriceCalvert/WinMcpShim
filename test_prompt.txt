@@ -1,4 +1,3 @@
-```
 Exercise the WinMcpShim MCP server by running through every tool it exposes. Work entirely inside a temporary sandbox so nothing existing is touched.
 
 Procedure:
@@ -39,6 +38,8 @@ Procedure:
 
    Cleanup
    - `delete` each file in the sandbox, then the empty subdirectory, then the sandbox itself. Confirm `list` on the parent no longer shows the sandbox.
+   
+   If available, test powershell and all the git tools.
 
 3. After the run, print a summary table: tool, status (pass/fail), and a short note for any failures. Do not summarise narratively beyond that table.
 
@@ -46,4 +47,3 @@ Constraints:
 - Use only WinMcpShim tools — no other filesystem tools, no Python, no shell helpers outside `run`.
 - All paths must be inside the sandbox except the initial `roots` call.
 - If `roots` returns no writable location, stop and report that.
-```

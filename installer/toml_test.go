@@ -351,3 +351,84 @@ func TestFullPipeline_TomlModification(t *testing.T) {
 		t.Error("default Git path still present after full pipeline")
 	}
 }
+
+
+// T-49: AddAllowedCommand inserts the command into an empty allowed_commands
+// block, preserving structure for the SetAllowedCommands replace path (INS-12a).
+func TestAddAllowedCommand_EmptyList(t *testing.T) {
+	src := "[run]\nallowed_commands = []\n"
+	got, err := AddAllowedCommand(src, `C:\Program Files\Git\cmd\git.exe`)
+	if err != nil {
+		t.Fatalf("AddAllowedCommand: %v", err)
+	}
+	if !strings.Contains(got, `"C:\\Program Files\\Git\\cmd\\git.exe"`) {
+		t.Errorf("git.exe not present after AddAllowedCommand:\n%s", got)
+	}
+	if err := ValidateToml(got); err != nil {
+		t.Fatalf("ValidateToml: %v", err)
+	}
+}
+
+// T-49a: AddAllowedCommand preserves existing entries when appending (INS-12a).
+func TestAddAllowedCommand_PreservesExisting(t *testing.T) {
+	src := `[run]
+allowed_commands = ["C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"]
+`
+	got, err := AddAllowedCommand(src, `C:\Program Files\Git\cmd\git.exe`)
+	if err != nil {
+		t.Fatalf("AddAllowedCommand: %v", err)
+	}
+	if !strings.Contains(got, `powershell.exe`) {
+		t.Error("existing powershell.exe entry lost after AddAllowedCommand")
+	}
+	if !strings.Contains(got, `git.exe`) {
+		t.Error("git.exe not appended")
+	}
+	if err := ValidateToml(got); err != nil {
+		t.Fatalf("ValidateToml: %v", err)
+	}
+}
+
+// T-49b: AddAllowedCommand is idempotent: a second call with the same command
+// returns the input unchanged (INS-12a).
+func TestAddAllowedCommand_Idempotent(t *testing.T) {
+	src := "[run]\nallowed_commands = []\n"
+	gitExe := `C:\Program Files\Git\cmd\git.exe`
+	once, err := AddAllowedCommand(src, gitExe)
+	if err != nil {
+		t.Fatalf("first AddAllowedCommand: %v", err)
+	}
+	twice, err := AddAllowedCommand(once, gitExe)
+	if err != nil {
+		t.Fatalf("second AddAllowedCommand: %v", err)
+	}
+	if once != twice {
+		t.Errorf("AddAllowedCommand not idempotent:\nonce:\n%s\ntwice:\n%s", once, twice)
+	}
+}
+
+// T-52: AddAllowedCommand match is case-insensitive on the absolute path
+// (Windows filesystem semantics) (INS-12a).
+func TestAddAllowedCommand_CaseInsensitive(t *testing.T) {
+	src := `[run]
+allowed_commands = ["C:\\Program Files\\Git\\cmd\\git.exe"]
+`
+	got, err := AddAllowedCommand(src, `c:\program files\git\cmd\GIT.EXE`)
+	if err != nil {
+		t.Fatalf("AddAllowedCommand: %v", err)
+	}
+	if got != src {
+		t.Errorf("expected unchanged content for case-only difference, got:\n%s", got)
+	}
+}
+
+// T-53: AddAllowedCommand on a file with no [run] section returns an error
+// from SetAllowedCommands rather than silently constructing a new section
+// in an unexpected place (INS-12a).
+func TestAddAllowedCommand_NoRunSection(t *testing.T) {
+	src := "[security]\nallowed_roots = []\n"
+	_, err := AddAllowedCommand(src, `C:\Program Files\Git\cmd\git.exe`)
+	if err == nil {
+		t.Error("expected error when [run] section is missing, got nil")
+	}
+}

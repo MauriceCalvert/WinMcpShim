@@ -1049,6 +1049,116 @@ func TestDelete_NonEmptyDir(t *testing.T) {
 	}
 }
 
+func TestDelete_MultiSpaceSeparated(t *testing.T) {
+	dir := t.TempDir()
+	a := writeTestFile(t, dir, "a.txt", "a")
+	b := writeTestFile(t, dir, "b.txt", "b")
+	c := writeTestFile(t, dir, "c.txt", "c")
+	roots := []string{dir}
+	arg := a + " " + b + " " + c
+	got, err := Delete(params("paths", arg), roots)
+	if err != nil {
+		t.Fatalf("Delete error: %v", err)
+	}
+	if !strings.Contains(got, "Deleted 3 of 3") {
+		t.Errorf("expected 'Deleted 3 of 3' in output, got %q", got)
+	}
+	for _, p := range []string{a, b, c} {
+		if _, err := os.Stat(p); !os.IsNotExist(err) {
+			t.Errorf("%s should have been deleted", p)
+		}
+	}
+}
+
+func TestDelete_MultiJSONArray(t *testing.T) {
+	dir := t.TempDir()
+	a := writeTestFile(t, dir, "a.txt", "a")
+	b := writeTestFile(t, dir, "b.txt", "b")
+	roots := []string{dir}
+	jsonArg := `["` + strings.ReplaceAll(a, `\`, `\\`) + `","` + strings.ReplaceAll(b, `\`, `\\`) + `"]`
+	got, err := Delete(params("paths", jsonArg), roots)
+	if err != nil {
+		t.Fatalf("Delete error: %v", err)
+	}
+	if !strings.Contains(got, "Deleted 2 of 2") {
+		t.Errorf("expected 'Deleted 2 of 2' in output, got %q", got)
+	}
+}
+
+func TestDelete_MultiQuotedSpaces(t *testing.T) {
+	dir := t.TempDir()
+	sub := writeTestSubdir(t, dir, "has space")
+	a := writeTestFile(t, sub, "x.txt", "x")
+	b := writeTestFile(t, dir, "y.txt", "y")
+	roots := []string{dir}
+	arg := `"` + a + `" "` + b + `"`
+	got, err := Delete(params("paths", arg), roots)
+	if err != nil {
+		t.Fatalf("Delete error: %v", err)
+	}
+	if !strings.Contains(got, "Deleted 2 of 2") {
+		t.Errorf("expected 'Deleted 2 of 2' in output, got %q", got)
+	}
+}
+
+func TestDelete_MultiOneOutsideRootsAbortsAll(t *testing.T) {
+	dir := t.TempDir()
+	a := writeTestFile(t, dir, "a.txt", "a")
+	roots := []string{dir}
+	arg := a + " C:\\Windows\\System32\\notepad.exe"
+	_, err := Delete(params("paths", arg), roots)
+	if err == nil {
+		t.Fatal("expected confinement error")
+	}
+	if _, statErr := os.Stat(a); os.IsNotExist(statErr) {
+		t.Error("a.txt should NOT have been deleted when a sibling path failed confinement")
+	}
+}
+
+func TestDelete_MultiPartialFailureReports(t *testing.T) {
+	dir := t.TempDir()
+	a := writeTestFile(t, dir, "a.txt", "a")
+	missing := filepath.Join(dir, "missing.txt")
+	roots := []string{dir}
+	arg := a + " " + missing
+	_, err := Delete(params("paths", arg), roots)
+	if err == nil {
+		t.Fatal("expected error reporting partial failure")
+	}
+	msg := err.Error()
+	if !strings.Contains(msg, "Deleted 1 of 2") {
+		t.Errorf("expected 'Deleted 1 of 2' summary in error, got %q", msg)
+	}
+	if !strings.Contains(msg, "Errors:") {
+		t.Errorf("expected 'Errors:' section in error, got %q", msg)
+	}
+	if _, statErr := os.Stat(a); !os.IsNotExist(statErr) {
+		t.Error("a.txt should have been deleted (best-effort)")
+	}
+}
+
+func TestDelete_PathAndPathsBothRejected(t *testing.T) {
+	dir := t.TempDir()
+	a := writeTestFile(t, dir, "a.txt", "a")
+	roots := []string{dir}
+	_, err := Delete(params("path", a, "paths", a), roots)
+	if err == nil {
+		t.Fatal("expected error when both 'path' and 'paths' provided")
+	}
+	if _, statErr := os.Stat(a); os.IsNotExist(statErr) {
+		t.Error("a.txt should NOT have been deleted on validation error")
+	}
+}
+
+func TestDelete_NoArgsRejected(t *testing.T) {
+	dir := t.TempDir()
+	roots := []string{dir}
+	_, err := Delete(params(), roots)
+	if err == nil {
+		t.Fatal("expected error when neither 'path' nor 'paths' provided")
+	}
+}
+
 // ===== Copy additional =====
 
 func TestCopy_HappyPath(t *testing.T) {

@@ -5,12 +5,10 @@ package installer
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"strings"
 
+	"github.com/MauriceCalvert/WinMcpShim/shared"
 	"golang.org/x/sys/windows"
-	"golang.org/x/sys/windows/registry"
 )
 
 // GetWindowsBuild returns the Windows build number via RtlGetVersion.
@@ -69,46 +67,10 @@ func CheckShimFiles(dir string) []CheckResult {
 	return results
 }
 
-// FindGitForWindows locates the Git for Windows installation (INS-05).
-// Discovery order: registry, where.exe, common paths.
+// FindGitForWindows is a thin wrapper preserving the installer-package
+// API; the implementation now lives in shared so the shim can use it too.
 func FindGitForWindows() (string, error) {
-	// Step 1: Registry
-	key, err := registry.OpenKey(registry.LOCAL_MACHINE, `SOFTWARE\GitForWindows`, registry.QUERY_VALUE)
-	if err == nil {
-		defer key.Close()
-		val, _, err := key.GetStringValue("InstallPath")
-		if err == nil && dirExists(filepath.Join(val, "usr", "bin")) {
-			return val, nil
-		}
-	}
-	// Step 2: where.exe grep — derive Git root as grandparent
-	out, err := exec.Command("where.exe", "grep").Output()
-	if err == nil {
-		lines := strings.Split(strings.TrimSpace(string(out)), "\n")
-		for _, line := range lines {
-			line = strings.TrimSpace(line)
-			lower := strings.ToLower(line)
-			if strings.Contains(lower, `\usr\bin\grep.exe`) {
-				gitRoot := filepath.Dir(filepath.Dir(filepath.Dir(line)))
-				if dirExists(filepath.Join(gitRoot, "usr", "bin")) {
-					return gitRoot, nil
-				}
-			}
-		}
-	}
-	// Step 3: Common paths
-	candidates := []string{
-		filepath.Join(os.Getenv("ProgramFiles"), "Git"),
-		filepath.Join(os.Getenv("ProgramFiles(x86)"), "Git"),
-		filepath.Join(os.Getenv("LOCALAPPDATA"), "Programs", "Git"),
-		`C:\Git`,
-	}
-	for _, c := range candidates {
-		if dirExists(filepath.Join(c, "usr", "bin")) {
-			return c, nil
-		}
-	}
-	return "", fmt.Errorf("Git for Windows not found. Install from https://gitforwindows.org/")
+	return shared.FindGitForWindows()
 }
 
 // CheckGitTools checks that all 8 required executables exist in gitRoot\usr\bin (INS-05b).

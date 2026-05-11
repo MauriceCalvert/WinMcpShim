@@ -45,7 +45,7 @@ allowed_commands = []
 [builtin_descriptions]
 cat = "Read one or more files in a single call, returning their contents. Pass multiple space-separated absolute paths (quote paths with spaces) or a JSON array of strings. Prefer over 'read' when you need several files at once. Max combined output 512KB."
 copy = "Copy a file or directory tree. Fails if destination already exists. Set recursive=true for directories (required; omitting it errors)."
-delete = "Delete a single file or empty directory. Cannot delete non-empty directories."
+delete = "Delete one or more files or empty directories. Pass 'path' for a single target, or 'paths' (space-separated absolute paths, or a JSON array of strings) to delete many in one call. Cannot delete non-empty directories."
 diff = "Compare two text files line by line and show unified diff. Returns empty string if files are identical. Use context_lines to control surrounding context (default 3)."
 edit = "Find-and-replace a unique string in a file. old_text must appear exactly once; errors if not found or ambiguous."
 head = "Show the first N lines of a file (default 10). Lightweight preview without reading the full file."

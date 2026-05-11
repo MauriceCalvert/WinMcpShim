@@ -131,11 +131,11 @@ func BuiltinSchemas(descriptions map[string]string, runDefaultTimeout int, maxTi
 		{"delete", `{
 			"type": "object",
 			"properties": {
-				"path": {"type": "string", "description": "Absolute path to delete"}
-			},
-			"required": ["path"]
+				"path": {"type": "string", "description": "Absolute path to delete (use this for a single target)"},
+				"paths": {"type": "string", "description": "Space-separated absolute paths (quote paths with spaces), or a JSON array of strings. Use this to delete many files in one call."}
+			}
 		}`, &shared.ToolAnnotations{
-			Title:           "Delete File or Empty Directory",
+			Title:           "Delete File(s) or Empty Director(ies)",
 			ReadOnlyHint:    false,
 			DestructiveHint: true,
 			IdempotentHint:  false,

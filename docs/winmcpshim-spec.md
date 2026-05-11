@@ -244,13 +244,28 @@ Uses os.Rename. Refuses to overwrite existing files.
 
 ### 5.7 delete
 
-Parameters:
-- `path` (string, required) — absolute path
+Parameters (provide exactly one of):
+- `path` (string) — single absolute path
+- `paths` (string) — multiple absolute paths, either space-separated
+  (quote paths with spaces) or a JSON array of strings
 
-Deletes a single file or an **empty** directory only (os.Remove, not
-os.RemoveAll). Refuses to delete non-empty directories. No recursive
-delete. This is deliberate — Claude should not be able to wipe
-directory trees in a single call.
+Deletes one or more files or **empty** directories only (os.Remove,
+not os.RemoveAll). Refuses to delete non-empty directories. No
+recursive delete. This is deliberate — Claude must never be able to
+wipe directory trees in a single call, even when batching.
+
+Every supplied path is confinement-checked (§8.1) before any deletion
+is attempted; if any path is outside the allowed roots the call
+returns an error and no files are touched. Once confinement passes,
+per-path `os.Remove` is best-effort: each path is attempted
+independently, and the result lists which paths were deleted and
+which failed. If any per-path removal fails, the tool reports the
+aggregated result as an error so the failure is visible to the
+caller; deletions that succeeded before that point are not rolled
+back (they cannot be).
+
+When the single-path `path` form is used, the success message is the
+historical `Deleted <path>` string so existing callers keep working.
 
 ### 5.8 list
 
@@ -326,6 +341,18 @@ Output limit: 100 KB.
 
 Path confinement (§8.1) applies to `command` — the executable must
 be within an allowed root or on the system PATH.
+
+**Auto-augmentation of the run allowlist with git.exe.** At startup,
+after parsing `--allowed-commands`, the shim probes for Git for
+Windows (registry `HKLM\SOFTWARE\GitForWindows\InstallPath`, then
+`where.exe grep`, then common install paths). If Git is found and
+`<gitRoot>\cmd\git.exe` exists, that path is silently appended to the
+in-memory allowlist if not already present (case-insensitive). This
+lets the user invoke `git` by bare name through the run tool without
+having to add Git\cmd to allowed-roots or list git.exe in their MCPB
+allowed-commands UI. The augmentation is opportunistic and additive
+only — any failure leaves the allowlist unchanged. No persistent state
+is written.
 
 ### 5.12 cat
 
@@ -1701,6 +1728,7 @@ single-source traceability.
 | 5.11.6 | run: output truncation | `TestRun_OutputTruncation` | PARTIAL |
 | 5.11.7 | run: path confinement on command | `TestRun_CommandConfinement` | OK |
 | 5.11.8 | run: timeout parameter | `TestRun_TimeoutParameter` | OK |
+| 5.11.9 | run: auto-augment allowlist with git.exe at startup | `TestAugmentAllowedCommandsWithGit_AddsGitExe`, `TestAugmentAllowedCommandsWithGit_Idempotent`, `TestAugmentAllowedCommandsWithGit_CaseInsensitiveSkip` | OK |
 | 5.12.1 | cat: multiple files | `TestCat_MultipleFiles` | OK |
 | 5.12.2 | cat: error on missing file | `TestCat_MissingFile` | OK |
 | 5.12.3 | cat: binary/UTF-16 checks per file | — | N/A |
@@ -1893,12 +1921,12 @@ single-source traceability.
 
 | Status | Count |
 |--------|-------|
-| OK | 179 |
+| OK | 180 |
 | N/A | 21 |
 | ACCEPT | 4 |
 | PARTIAL | 2 |
 | MISS | 0 |
-| **Total** | **206** |
+| **Total** | **207** |
 
 All 10 mandatory items (Appendix A.1) are implemented and tested.
 All MISS items resolved: UTF-16 decode, built-in grep, confinement

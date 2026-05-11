@@ -234,15 +234,52 @@ func Move(params map[string]interface{}, allowedRoots []string) (string, error) 
 	return fmt.Sprintf("Moved %s to %s", source, destination), nil
 }
 
-// Delete deletes a file or empty directory (§5.7).
+// Delete deletes one or more files or empty directories (§5.7).
+// Accepts either "path" (single string) or "paths" (space-separated or
+// JSON array of strings). Each path is confinement-checked before any
+// deletion is attempted; if any path is outside an allowed root, no
+// deletions occur. Directories must be empty (os.Remove, not RemoveAll).
 func Delete(params map[string]interface{}, allowedRoots []string) (string, error) {
-	path, err := shared.RequireString(params, "path")
+	paths, multi, err := collectDeletePaths(params)
 	if err != nil {
 		return "", err
 	}
-	if err := shared.CheckPathConfinementFull(path, allowedRoots); err != nil {
-		return "", err
+	for _, p := range paths {
+		if err := shared.CheckPathConfinementFull(p, allowedRoots); err != nil {
+			return "", err
+		}
 	}
+	if !multi {
+		return deleteOne(paths[0])
+	}
+	var deleted []string
+	var failures []string
+	for _, p := range paths {
+		if _, err := deleteOne(p); err != nil {
+			failures = append(failures, err.Error())
+			continue
+		}
+		deleted = append(deleted, p)
+	}
+	var sb strings.Builder
+	fmt.Fprintf(&sb, "Deleted %d of %d:\n", len(deleted), len(paths))
+	for _, p := range deleted {
+		fmt.Fprintf(&sb, "  ok: %s\n", p)
+	}
+	if len(failures) > 0 {
+		sb.WriteString("Errors:\n")
+		for _, f := range failures {
+			fmt.Fprintf(&sb, "  %s\n", f)
+		}
+		return "", fmt.Errorf("%s", strings.TrimRight(sb.String(), "\n"))
+	}
+	return strings.TrimRight(sb.String(), "\n"), nil
+}
+
+// deleteOne removes a single path using os.Remove, returning the same
+// "Deleted ..." / "Directory is not empty: ..." messages the single-path
+// Delete API has always returned.
+func deleteOne(path string) (string, error) {
 	if err := os.Remove(path); err != nil {
 		if strings.Contains(err.Error(), "directory is not empty") || strings.Contains(err.Error(), "The directory is not empty") {
 			return "", fmt.Errorf("Directory is not empty: %s", path)
@@ -250,6 +287,44 @@ func Delete(params map[string]interface{}, allowedRoots []string) (string, error
 		return "", fmt.Errorf("delete %s: %w", path, err)
 	}
 	return fmt.Sprintf("Deleted %s", path), nil
+}
+
+// collectDeletePaths returns the list of paths to delete and whether the
+// caller used the multi-path "paths" form. Exactly one of "path" or "paths"
+// must be supplied.
+func collectDeletePaths(params map[string]interface{}) ([]string, bool, error) {
+	rawPaths, hasPaths := shared.OptionalString(params, "paths")
+	hasPaths = hasPaths && strings.TrimSpace(rawPaths) != ""
+	_, hasPath := shared.OptionalString(params, "path")
+	if hasPaths && hasPath {
+		return nil, false, fmt.Errorf("provide either 'path' or 'paths', not both")
+	}
+	if hasPaths {
+		var list []string
+		if strings.HasPrefix(strings.TrimSpace(rawPaths), "[") {
+			if err := json.Unmarshal([]byte(rawPaths), &list); err != nil {
+				return nil, false, fmt.Errorf("paths must be space-separated absolute paths or a JSON array of strings")
+			}
+		} else {
+			list = splitPaths(rawPaths)
+		}
+		out := make([]string, 0, len(list))
+		for _, p := range list {
+			p = strings.TrimSpace(p)
+			if p != "" {
+				out = append(out, p)
+			}
+		}
+		if len(out) == 0 {
+			return nil, true, fmt.Errorf("no paths provided")
+		}
+		return out, true, nil
+	}
+	path, err := shared.RequireString(params, "path")
+	if err != nil {
+		return nil, false, fmt.Errorf("missing required parameter: provide 'path' or 'paths'")
+	}
+	return []string{path}, false, nil
 }
 
 // List lists directory contents with optional pattern filter (§5.8).

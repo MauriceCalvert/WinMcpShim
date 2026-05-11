@@ -66,6 +66,41 @@ func SetAllowedCommands(content string, cmds []string) (string, error) {
 	return content[:headerEnd] + replacement + "\n" + content[headerEnd:], nil
 }
 
+// AddAllowedCommand ensures cmd appears in run.allowed_commands, preserving
+// any existing entries. Idempotent: if cmd is already present (case-insensitive
+// comparison on the absolute path), the content is returned unchanged. Used by
+// the installer to wire git.exe into the run allowlist after Git is discovered
+// (INS-12a).
+func AddAllowedCommand(content string, cmd string) (string, error) {
+	existing, err := readAllowedCommands(content)
+	if err != nil {
+		return "", err
+	}
+	cmdLower := strings.ToLower(cmd)
+	for _, e := range existing {
+		if strings.ToLower(e) == cmdLower {
+			return content, nil
+		}
+	}
+	return SetAllowedCommands(content, append(existing, cmd))
+}
+
+// readAllowedCommands extracts run.allowed_commands from the TOML content.
+// A missing block or missing [run] section returns an empty slice with no
+// error; the caller treats both as "no entries yet". Parse errors are
+// surfaced so a malformed file is not silently overwritten.
+func readAllowedCommands(content string) ([]string, error) {
+	var doc struct {
+		Run struct {
+			AllowedCommands []string `toml:"allowed_commands"`
+		} `toml:"run"`
+	}
+	if _, err := toml.Decode(content, &doc); err != nil {
+		return nil, fmt.Errorf("parse toml for allowed_commands: %w", err)
+	}
+	return doc.Run.AllowedCommands, nil
+}
+
 // FormatTomlStrings formats a list of basenames as a TOML string array.
 func FormatTomlStrings(items []string) string {
 	if len(items) == 0 {
